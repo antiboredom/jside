@@ -1,21 +1,30 @@
 @font-face {
-	font-family: karla;
-	src: url('../fonts/karla/Karla-Regular.ttf');
+  font-family: karla;
+  src: url('../fonts/karla/Karla-Regular.ttf');
 }
 
 @font-face {
-	font-family: karla-bold;
-	src: url('../fonts/karla/Karla-Bold.ttf');
+  font-family: karla-bold;
+  src: url('../fonts/karla/Karla-Bold.ttf');
 }
 
 @font-face {
-	font-family: source-code;
-	src: url('../fonts/Source_Code_Pro/SourceCodePro-Regular.ttf');
+  font-family: source-code;
+  src: url('../fonts/Source_Code_Pro/SourceCodePro-Regular.ttf');
+}
+
+@font-face {
+  font-family: inconsolata;
+  src: url('../fonts/Inconsolata/inconsolata.ttf');
+}
+@font-face {
+  font-family: avenir-next-medium;
+  src: url('../fonts/Avenir_Next_Medium/AvenirNextLTW01-Medium.ttf');
 }
 
 body, html {
-  background: #c8c5c2;
-  color: #231f20;
+  background: #AFAFAF;
+  color: #58595B;
   height: 100%;
   margin: 0;
   padding: 0;

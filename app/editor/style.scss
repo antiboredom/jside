@@ -13,7 +13,7 @@
 }
 
 #editor {
-  font: 14px source-code;
+  font: 14px inconsolata, source-code;
   border-radius: 7px;
   flex: 1;
 }
@@ -22,11 +22,22 @@
     color: #58585b;
 }
 
+.ace_content, .ace_gutter {
+  padding-top: 5px;
+}
+.ace_gutter-active-line {
+  margin-top: 5px;
+}
+
 .ace_gutter-cell {
   background-image: none !important;
-  background-position: 2px center !important;
-  padding-right: 15px !important;;
+  background-position: 0 !important;
+  padding-right: 5px !important;
+  padding-left: 5px !important;
+  color: #AFAFAF;
+  /*background-color: #AFAFAF !important;*/
 }
+
 
 .ace_info {
   background-color: #D7E5F5 !important;
@@ -52,3 +63,50 @@ body.horizontal {
 .ace_scroller.ace_scroll-left {
   box-shadow: none;
 }
+
+
+/* property, tag, boolean,
+   number, function-name, constant,
+   symbol */
+.ace_numeric, 
+.ace_tag {
+    color: #DC3787 !important; /* not p5 pink, but related */ 
+}
+
+/* atrule, attr-value, keyword,
+   class-name */
+.ace_type,
+.ace_class,
+.ace_attribute-name {
+    color: #704F21 !important; /* darker brown */
+}
+
+/* selector, attr-name, 
+function, builtin */
+.ace_function, 
+.ace_keyword,
+.ace_support {
+    color: #00A1D3 !important; /* not p5 blue, but related */ 
+}
+
+/* comment, block-comment, prolog,
+   doctype, cdata */
+.ace_comment {
+    color: #A0A0A0 !important; /* light gray */
+}
+
+/* operator, entity, url,
+variable */ 
+.ace_string {
+  color: #a67f59 !important; /* og coy a67f59 a light brown */
+}
+
+.ace_operator {
+    color: #333 !important;
+}
+
+/* regex, important */
+.ace_regexp {
+  color: #e90 !important; /* og coy e90 orange */
+}
+
