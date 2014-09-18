@@ -59,9 +59,8 @@ body.horizontal {
     flex-direction: column;
   }
 }
-
 .ace_scroller.ace_scroll-left {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 

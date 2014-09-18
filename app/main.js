@@ -51,6 +51,7 @@ var appConfig = {
   },
 
   ready: function() {
+    this.modeFunction('update');
     updater.check();
     keybindings.setup(this);
     menu.setup(this);
@@ -385,6 +386,10 @@ var appConfig = {
 
     toggleSettingsPane: function() {
       this.showSettings = !this.showSettings;
+    },
+
+    showHelp: function() {
+      gui.Shell.openExternal(this.$options.mode.referenceURL);
     }
 
   }

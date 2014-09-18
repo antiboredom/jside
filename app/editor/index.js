@@ -44,15 +44,7 @@ module.exports = {
     this.ace.setTheme('ace/theme/tomorrow');
     this.ace.setReadOnly(true);
 
-    //override default preference pane
-    var self = this;
-    this.ace.commands.addCommand({
-      name: 'Preferences',
-      bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
-      exec: function(editor) {
-        self.$root.toggleSettingsPane();
-      }
-    });
+    this.customizeCommands();
   },
 
   methods: {
@@ -113,6 +105,36 @@ module.exports = {
       this.ace.getSession().setTabSize(settings.tabSize);
       this.ace.getSession().setUseSoftTabs(settings.tabType === 'spaces');
       this.ace.getSession().setUseWrapMode(settings.wordWrap === true);
+    },
+
+    customizeCommands: function() {
+      var self = this;
+
+      var commands = [{
+        name: "blockoutdent",
+        bindKey: {win: 'Ctrl-[,',  mac: 'Command-['},
+        exec: function(editor) { editor.blockOutdent(); },
+        multiSelectAction: "forEachLine",
+        scrollIntoView: "selectionPart"
+      }, {
+        name: "blockindent",
+        bindKey: {win: 'Ctrl-],',  mac: 'Command-]'},
+        exec: function(editor) { editor.blockIndent(); },
+        multiSelectAction: "forEachLine",
+        scrollIntoView: "selectionPart"
+      }, {
+        name: 'Preferences',
+        bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
+        exec: function(editor) {
+          self.$root.toggleSettingsPane();
+        }
+      }];
+
+      commands.forEach(function(command){
+        this.ace.commands.addCommand(command);
+      });
+
     }
+
   }
 };

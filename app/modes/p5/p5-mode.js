@@ -2,9 +2,6 @@ var wrench = nodeRequire('wrench');
 var Path = nodeRequire('path');
 var os = nodeRequire('os');
 var fs = nodeRequire('fs');
-var $ = require('jquery');
-var util = require('util');
-
 
 module.exports = {
   newProject: function() {
@@ -58,23 +55,31 @@ module.exports = {
     this.saveAll();
 
     if (this.outputWindow) {
-      this.outputWindow.reloadIgnoringCache();
-      this.outputWindow.show();
-      this.outputWindow.focus();
+      if (this.settings.runInBrowser) {
+        gui.Shell.openExternal(url);
+      } else {
+        this.outputWindow.reloadIgnoringCache();
+        this.outputWindow.show();
+        this.outputWindow.focus();
+      }
     } else {
       this.running = true;
       gui.App.clearCache();
       startServer(this.projectPath, this, function(url) {
-        self.outputWindow = self.newWindow(url, {toolbar: true, 'inject-js-start': 'js/debug-console.js'});
-        self.outputWindow.on('document-start', function(){
-          self.outputWindow.show();
-        });
-        //self.outputWindow.focus();
-        self.outputWindow.on("close", function(){
-          self.outputWindow = null;
-          this.close(true);
-          self.running = false;
-        });
+        if (self.settings.runInBrowser) {
+          gui.Shell.openExternal(url);
+        } else {
+          self.outputWindow = self.newWindow(url, {toolbar: true, 'inject-js-start': 'js/debug-console.js'});
+          self.outputWindow.on('document-start', function(){
+            self.outputWindow.show();
+          });
+          //self.outputWindow.focus();
+          self.outputWindow.on("close", function(){
+            self.outputWindow = null;
+            this.close(true);
+            self.running = false;
+          });
+        }
 
       });
     }
@@ -84,7 +89,36 @@ module.exports = {
     if (this.outputWindow) {
       this.outputWindow.close();
     }
-  }
+  },
+
+  update: function(callback) {
+    var pathPrefix = 'mode_assets/p5/empty_project/libraries/';
+    var urlPrefex = 'https://raw.githubusercontent.com/lmccart/p5.js/master/lib/';
+
+    var files = [
+      { local: pathPrefix + 'p5.js', remote: urlPrefex + 'p5.js' },
+      { local: pathPrefix + 'p5.sound.js', remote: urlPrefex + 'addons/p5.sound.js' },
+      { local: pathPrefix + 'p5.dom.js', remote: urlPrefex + 'addons/p5.dom.js' }
+    ];
+
+    var checked = 0;
+
+    files.forEach(function(file) {
+      download(file.remote, file.local, function(data){
+        if (data) {
+          fs.writeFile(file.local, data, function(err){
+            if (err) throw err;
+          });
+        }
+        checked ++;
+        if (checked == files.length && typeof callback !== 'undefined') {
+          callback();
+        }
+      });
+    });
+  },
+
+  referenceURL: 'http://p5js.org/reference/'
 
 };
 
@@ -124,4 +158,44 @@ function startServer(path, app, callback) {
     callback(url);
   }
 
+}
+
+function download(url, local, cb) {
+  getLine(local, 0, function(line) {
+    var shouldUpdate = true;
+    var data = '';
+    var lines = [];
+    var request = nodeRequire('https').get(url, function(res) {
+      res.on('data', function(chunk) {
+        data += chunk;
+        lines = data.split('\n');
+        if (lines.length > 1 && line == lines[0]) {
+          shouldUpdate = false;
+          res.destroy();
+        }
+      });
+
+      res.on('end', function() {
+        if (shouldUpdate) {
+          cb(data);
+        } else {
+          cb(null);
+        }
+      })
+    });
+
+    request.on('error', function(e) {
+      console.log("Got error: " + e.message);
+      cb(null);
+    });
+  });
+}
+
+function getLine(filename, lineNo, callback) {
+  fs.readFile(filename, function (err, data) {
+    if (err) throw err;
+
+    var lines = data.toString('utf-8').split("\n");
+    callback(lines[lineNo]);
+  });
 }

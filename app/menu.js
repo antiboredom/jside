@@ -32,7 +32,7 @@ module.exports.setup = function(app) {
     app.saveFile();
   }}));
 
-  fileMenu.append(new gui.MenuItem({ label: 'Save File As \t\t\t\u21E7\u2318S', click: function(){
+  fileMenu.append(new gui.MenuItem({ label: 'Save File As \t\t\u21E7\u2318S', click: function(){
     $('#saveFile').trigger('click');
   }}));
 
@@ -42,12 +42,16 @@ module.exports.setup = function(app) {
 
   fileMenu.append(new gui.MenuItem({ type: 'separator' }));
 
-  fileMenu.append(new gui.MenuItem({ label: 'Export \t\t\t\u2318E', click: function(){
-    app.export();
-  }}));
+  //fileMenu.append(new gui.MenuItem({ label: 'Export \t\t\t\u2318E', click: function(){
+    //app.export();
+  //}}));
 
   fileMenu.append(new gui.MenuItem({ label: 'Run \t\t\t\u2318R', click: function(){
     app.run();
+  }}));
+
+  help.append(new gui.MenuItem({ label: 'Reference', click: function(){
+    app.showHelp();
   }}));
 
   win.menu = menubar;

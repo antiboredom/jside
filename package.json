@@ -2,7 +2,7 @@
   "author": "Sam Lavigne",
   "name": "p5",
   "description": "Javascript IDE for beginners",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "devDependencies": {
     "gulp-rename": "^1.2.0",
     "partialify": "^3.1.1",

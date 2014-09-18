@@ -1,4 +1,4 @@
-/*! p5.js v0.2.23 August 01, 2014 */
+/*! p5.js v0.3.2 August 11, 2014 */
 var shim = function (require) {
     window.requestDraw = function () {
       return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback, element) {
@@ -299,7 +299,8 @@ var core = function (require, shim, constants) {
       'loadImage',
       'loadStrings',
       'loadXML',
-      'loadShape'
+      'loadShape',
+      'loadTable'
     ];
     p5.prototype._removeFuncs = [];
     p5.prototype._registerPreloadFunc = function (func) {
@@ -463,7 +464,7 @@ var p5Color = function (require, core, constants) {
       for (var i = 0; i < 3; i++) {
         a[i] = Math.floor(a[i]);
       }
-      var alpha = a[3] ? a[3] / 255 : 1;
+      var alpha = typeof a[3] !== 'undefined' ? a[3] / 255 : 1;
       return 'rgba(' + a[0] + ',' + a[1] + ',' + a[2] + ',' + alpha + ')';
     };
     p5.Color.getColor = function () {
@@ -539,17 +540,19 @@ var p5Graphics = function (require, core, constants) {
     p5.Graphics = function (elt, pInst) {
       p5.Element.call(this, elt, pInst);
       this.canvas = elt;
+      this.drawingContext = this.canvas.getContext('2d');
       if (this._pInst) {
         this._pInst._setProperty('_curElement', this);
-        this._pInst._setProperty('canvas', elt);
+        this._pInst._setProperty('canvas', this.canvas);
+        this._pInst._setProperty('drawingContext', this.drawingContext);
         this._pInst._setProperty('width', this.width);
         this._pInst._setProperty('height', this.height);
       } else {
         this.canvas.style.display = 'none';
       }
-      this.canvas.getContext('2d').fillStyle = '#FFFFFF';
-      this.canvas.getContext('2d').strokeStyle = '#000000';
-      this.canvas.getContext('2d').lineCap = constants.ROUND;
+      this.drawingContext.fillStyle = '#FFFFFF';
+      this.drawingContext.strokeStyle = '#000000';
+      this.drawingContext.lineCap = constants.ROUND;
     };
     p5.Graphics.prototype = Object.create(p5.Element.prototype);
     return p5.Graphics;
@@ -910,6 +913,7 @@ var p5Image = function (require, core, filters) {
       this.canvas = document.createElement('canvas');
       this.canvas.width = this.width;
       this.canvas.height = this.height;
+      this.drawingContext = this.canvas.getContext('2d');
       this.pixels = [];
     };
     p5.Image.prototype._setProperty = function (prop, value) {
@@ -934,7 +938,7 @@ var p5Image = function (require, core, filters) {
       tempCanvas.getContext('2d').drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height, 0, 0, tempCanvas.width, tempCanvas.width);
       this.canvas.width = this.width = width;
       this.canvas.height = this.height = height;
-      this.canvas.getContext('2d').drawImage(tempCanvas, 0, 0, width, height, 0, 0, width, height);
+      this.drawingContext.drawImage(tempCanvas, 0, 0, width, height, 0, 0, width, height);
       if (this.pixels.length > 0) {
         this.loadPixels();
       }
@@ -946,7 +950,7 @@ var p5Image = function (require, core, filters) {
       if (p5Image === undefined) {
         p5Image = this;
       }
-      var currBlend = this.canvas.getContext('2d').globalCompositeOperation;
+      var currBlend = this.drawingContext.globalCompositeOperation;
       var copyArgs = [
           p5Image,
           0,
@@ -958,9 +962,9 @@ var p5Image = function (require, core, filters) {
           this.width,
           this.height
         ];
-      this.canvas.getContext('2d').globalCompositeOperation = 'destination-out';
+      this.drawingContext.globalCompositeOperation = 'destination-out';
       this.copy.apply(this, copyArgs);
-      this.canvas.getContext('2d').globalCompositeOperation = currBlend;
+      this.drawingContext.globalCompositeOperation = currBlend;
     };
     p5.Image.prototype.filter = function (operation, value) {
       Filters.apply(this.canvas, Filters[operation.toLowerCase()], value);
@@ -1271,6 +1275,288 @@ var p5Vector = function (require, core, polargeometry, constants) {
     };
     return p5.Vector;
   }({}, core, polargeometry, constants);
+var p5TableRow = function (require, core) {
+    'use strict';
+    var p5 = core;
+    p5.TableRow = function (str, separator) {
+      var arr = [];
+      var obj = {};
+      if (str) {
+        separator = separator || ',';
+        arr = str.split(separator);
+      }
+      for (var i = 0; i < arr.length; i++) {
+        var key = i;
+        var val = arr[i];
+        obj[key] = val;
+      }
+      this.arr = arr;
+      this.obj = obj;
+      this.table = null;
+    };
+    p5.TableRow.prototype.set = function (column, value) {
+      if (typeof column === 'string') {
+        var cPos = this.table.columns.indexOf(column);
+        if (cPos >= 0) {
+          this.obj[column] = value;
+          this.arr[cPos] = value;
+        } else {
+          throw 'This table has no column named "' + column + '"';
+        }
+      } else {
+        if (column < this.table.columns.length) {
+          this.arr[column] = value;
+          var cTitle = this.table.columns[column];
+          this.obj[cTitle] = value;
+        } else {
+          throw 'Column #' + column + ' is out of the range of this table';
+        }
+      }
+    };
+    p5.TableRow.prototype.setNum = function (column, value) {
+      var floatVal = parseFloat(value, 10);
+      this.set(column, floatVal);
+    };
+    p5.TableRow.prototype.setString = function (column, value) {
+      var stringVal = value.toString();
+      this.set(column, stringVal);
+    };
+    p5.TableRow.prototype.get = function (column) {
+      if (typeof column === 'string') {
+        return this.obj[column];
+      } else {
+        return this.arr[column];
+      }
+    };
+    p5.TableRow.prototype.getNum = function (column) {
+      var ret;
+      if (typeof column === 'string') {
+        ret = parseFloat(this.obj[column], 10);
+      } else {
+        ret = parseFloat(this.arr[column], 10);
+      }
+      if (ret.toString() === 'NaN') {
+        throw 'Error: ' + this.obj[column] + ' is NaN (Not a Number)';
+      }
+      return ret;
+    };
+    p5.TableRow.prototype.getString = function (column) {
+      if (typeof column === 'string') {
+        return this.obj[column].toString();
+      } else {
+        return this.arr[column].toString();
+      }
+    };
+    return p5.TableRow;
+  }({}, core);
+var p5Table = function (require, core) {
+    'use strict';
+    var p5 = core;
+    p5.Table = function (rows) {
+      this.columns = [];
+      this.rows = [];
+    };
+    p5.Table.prototype.addRow = function (row) {
+      var r = row || new p5.TableRow();
+      if (typeof r.arr === 'undefined' || typeof r.obj === 'undefined') {
+        throw 'invalid TableRow: ' + r;
+      }
+      r.table = this;
+      this.rows.push(r);
+      return r;
+    };
+    p5.Table.prototype.removeRow = function (id) {
+      this.rows[id].table = null;
+      var chunk = this.rows.splice(id + 1, this.rows.length);
+      this.rows.pop();
+      this.rows = this.rows.concat(chunk);
+    };
+    p5.Table.prototype.getRow = function (r) {
+      return this.rows[r];
+    };
+    p5.Table.prototype.getRows = function () {
+      return this.rows;
+    };
+    p5.Table.prototype.findRow = function (value, column) {
+      if (typeof column === 'string') {
+        for (var i = 0; i < this.rows.length; i++) {
+          if (this.rows[i].obj[column] === value) {
+            return this.rows[i];
+          }
+        }
+      } else {
+        for (var j = 0; j < this.rows.length; j++) {
+          if (this.rows[j].arr[column] === value) {
+            return this.rows[j];
+          }
+        }
+      }
+      return null;
+    };
+    p5.Table.prototype.findRows = function (value, column) {
+      var ret = [];
+      if (typeof column === 'string') {
+        for (var i = 0; i < this.rows.length; i++) {
+          if (this.rows[i].obj[column] === value) {
+            ret.push(this.rows[i]);
+          }
+        }
+      } else {
+        for (var j = 0; j < this.rows.length; j++) {
+          if (this.rows[j].arr[column] === value) {
+            ret.push(this.rows[j]);
+          }
+        }
+      }
+      return ret;
+    };
+    p5.Table.prototype.matchRow = function (regexp, column) {
+      if (typeof column === 'number') {
+        for (var j = 0; j < this.rows.length; j++) {
+          if (this.rows[j].arr[column].match(regexp)) {
+            return this.rows[j];
+          }
+        }
+      } else {
+        for (var i = 0; i < this.rows.length; i++) {
+          if (this.rows[i].obj[column].match(regexp)) {
+            return this.rows[i];
+          }
+        }
+      }
+      return null;
+    };
+    p5.Table.prototype.matchRows = function (regexp, column) {
+      var ret = [];
+      if (typeof column === 'number') {
+        for (var j = 0; j < this.rows.length; j++) {
+          if (this.rows[j].arr[column].match(regexp)) {
+            ret.push(this.rows[j]);
+          }
+        }
+      } else {
+        for (var i = 0; i < this.rows.length; i++) {
+          if (this.rows[i].obj[column].match(regexp)) {
+            ret.push(this.rows[i]);
+          }
+        }
+      }
+      return ret;
+    };
+    p5.Table.prototype.getColumn = function (value) {
+      var ret = [];
+      if (typeof value === 'string') {
+        for (var i = 0; i < this.rows.length; i++) {
+          ret.push(this.rows[i].obj[value]);
+        }
+      } else {
+        for (var j = 0; j < this.rows.length; j++) {
+          ret.push(this.rows[j].arr[value]);
+        }
+      }
+      return ret;
+    };
+    p5.Table.prototype.clearRows = function () {
+      delete this.rows;
+      this.rows = [];
+    };
+    p5.Table.prototype.addColumn = function (title) {
+      var t = title || null;
+      this.columns.push(t);
+    };
+    p5.Table.prototype.getColumnCount = function () {
+      return this.columns.length;
+    };
+    p5.Table.prototype.getRowCount = function () {
+      return this.rows.length;
+    };
+    p5.Table.prototype.removeTokens = function (chars, column) {
+      var escape = function (s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      };
+      var charArray = [];
+      for (var i = 0; i < chars.length; i++) {
+        charArray.push(escape(chars.charAt(i)));
+      }
+      var regex = new RegExp(charArray.join('|'), 'g');
+      if (typeof column === 'undefined') {
+        for (var c = 0; c < this.columns.length; c++) {
+          for (var d = 0; d < this.rows.length; d++) {
+            var s = this.rows[d].arr[c];
+            s = s.replace(regex, '');
+            this.rows[d].arr[c] = s;
+            this.rows[d].obj[this.columns[c]] = s;
+          }
+        }
+      } else if (typeof column === 'string') {
+        for (var j = 0; j < this.rows.length; j++) {
+          var val = this.rows[j].obj[column];
+          val = val.replace(regex, '');
+          this.rows[j].obj[column] = val;
+          var pos = this.columns.indexOf(column);
+          this.rows[j].arr[pos] = val;
+        }
+      } else {
+        for (var k = 0; k < this.rows.length; k++) {
+          var str = this.rows[k].arr[column];
+          str = str.replace(regex, '');
+          this.rows[k].arr[column] = str;
+          this.rows[k].obj[this.columns[column]] = str;
+        }
+      }
+    };
+    p5.Table.prototype.trim = function (column) {
+      var regex = new RegExp(' ', 'g');
+      if (typeof column === 'undefined') {
+        for (var c = 0; c < this.columns.length; c++) {
+          for (var d = 0; d < this.rows.length; d++) {
+            var s = this.rows[d].arr[c];
+            s = s.replace(regex, '');
+            this.rows[d].arr[c] = s;
+            this.rows[d].obj[this.columns[c]] = s;
+          }
+        }
+      } else if (typeof column === 'string') {
+        for (var j = 0; j < this.rows.length; j++) {
+          var val = this.rows[j].obj[column];
+          val = val.replace(regex, '');
+          this.rows[j].obj[column] = val;
+          var pos = this.columns.indexOf(column);
+          this.rows[j].arr[pos] = val;
+        }
+      } else {
+        for (var k = 0; k < this.rows.length; k++) {
+          var str = this.rows[k].arr[column];
+          str = str.replace(regex, '');
+          this.rows[k].arr[column] = str;
+          this.rows[k].obj[this.columns[column]] = str;
+        }
+      }
+    };
+    p5.Table.prototype.removeColumn = function (c) {
+      var cString;
+      var cNumber;
+      if (typeof c === 'string') {
+        cString = c;
+        cNumber = this.columns.indexOf(c);
+        console.log('string');
+      } else {
+        cNumber = c;
+        cString = this.columns[c];
+      }
+      var chunk = this.columns.splice(cNumber + 1, this.columns.length);
+      this.columns.pop();
+      this.columns = this.columns.concat(chunk);
+      for (var i = 0; i < this.rows.length; i++) {
+        var tempR = this.rows[i].arr;
+        var chip = tempR.splice(cNumber + 1, tempR.length);
+        tempR.pop();
+        this.rows[i].arr = tempR.concat(chip);
+        delete this.rows[i].obj[cString];
+      }
+    };
+    return p5.Table;
+  }({}, core);
 var colorcreating_reading = function (require, core, p5Color) {
     'use strict';
     var p5 = core;
@@ -1334,6 +1620,12 @@ var colorcreating_reading = function (require, core, p5Color) {
           c.push(p5.prototype.lerp(c1[i], c2[i], amt));
         }
         return c;
+      } else if (c1 instanceof p5.Color) {
+        var pc = [];
+        for (var j = 0; j < 4; j++) {
+          pc.push(p5.prototype.lerp(c1.rgba[j], c2.rgba[j], amt));
+        }
+        return new p5.Color(this, pc);
       } else {
         return p5.prototype.lerp(c1, c2, amt);
       }
@@ -1382,15 +1674,15 @@ var colorsetting = function (require, core, constants, p5Color) {
       if (arguments[0] instanceof p5.Image) {
         this.image(arguments[0], 0, 0, this.width, this.height);
       } else {
-        var curFill = this.canvas.getContext('2d').fillStyle;
-        var ctx = this.canvas.getContext('2d');
+        var curFill = this.drawingContext.fillStyle;
+        var ctx = this.drawingContext;
         ctx.fillStyle = p5.Color.getColor.apply(this, arguments);
         ctx.fillRect(0, 0, this.width, this.height);
         ctx.fillStyle = curFill;
       }
     };
     p5.prototype.clear = function () {
-      this.canvas.width = this.canvas.width;
+      this.drawingContext.clearRect(0, 0, this.width, this.height);
     };
     p5.prototype.colorMode = function () {
       if (arguments[0] === constants.RGB || arguments[0] === constants.HSB) {
@@ -1413,7 +1705,7 @@ var colorsetting = function (require, core, constants, p5Color) {
     };
     p5.prototype.fill = function () {
       this._setProperty('_doFill', true);
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       ctx.fillStyle = p5.Color.getColor.apply(this, arguments);
     };
     p5.prototype.noFill = function () {
@@ -1424,7 +1716,7 @@ var colorsetting = function (require, core, constants, p5Color) {
     };
     p5.prototype.stroke = function () {
       this._setProperty('_doStroke', true);
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       ctx.strokeStyle = p5.Color.getColor.apply(this, arguments);
     };
     return p5;
@@ -1672,12 +1964,10 @@ var environment = function (require, core, constants) {
     p5.prototype.displayWidth = screen.width;
     p5.prototype.displayHeight = screen.height;
     p5.prototype.windowWidth = window.innerWidth;
-    window.addEventListener('resize', function (e) {
-      this.windowWidth = window.innerWidth;
-    });
     p5.prototype.windowHeight = window.innerHeight;
     window.addEventListener('resize', function (e) {
-      this.windowHeight = window.windowHeight;
+      this.windowWidth = window.innerWidth;
+      this.windowHeight = window.innerHeight;
     });
     p5.prototype.width = 0;
     p5.prototype.height = 0;
@@ -1827,9 +2117,9 @@ var imageloading_displaying = function (require, core, filters, canvas, constant
       }
       var vals = canvas.modeAdjust(x, y, width, height, this._imageMode);
       if (this._tint) {
-        this.canvas.getContext('2d').drawImage(this._getTintedImageCanvas(img), vals.x, vals.y, vals.w, vals.h);
+        this.drawingContext.drawImage(this._getTintedImageCanvas(img), vals.x, vals.y, vals.w, vals.h);
       } else {
-        this.canvas.getContext('2d').drawImage(frame, vals.x, vals.y, vals.w, vals.h);
+        this.drawingContext.drawImage(frame, vals.x, vals.y, vals.w, vals.h);
       }
     };
     p5.prototype.tint = function () {
@@ -1876,12 +2166,12 @@ var imagepixels = function (require, core, filters, p5Color) {
     var Filters = filters;
     p5.prototype.pixels = [];
     p5.prototype.blend = function () {
-      var currBlend = this.canvas.getContext('2d').globalCompositeOperation;
+      var currBlend = this.drawingContext.globalCompositeOperation;
       var blendMode = arguments[arguments.length - 1];
       var copyArgs = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
-      this.canvas.getContext('2d').globalCompositeOperation = blendMode;
+      this.drawingContext.globalCompositeOperation = blendMode;
       this.copy.apply(this, copyArgs);
-      this.canvas.getContext('2d').globalCompositeOperation = currBlend;
+      this.drawingContext.globalCompositeOperation = currBlend;
     };
     p5.prototype.copy = function () {
       var srcImage, sx, sy, sw, sh, dx, dy, dw, dh;
@@ -1908,7 +2198,7 @@ var imagepixels = function (require, core, filters, p5Color) {
       } else {
         throw new Error('Signature not supported');
       }
-      this.canvas.getContext('2d').drawImage(srcImage.canvas, sx, sy, sw, sh, dx, dy, dw, dh);
+      this.drawingContext.drawImage(srcImage.canvas, sx, sy, sw, sh, dx, dy, dw, dh);
     };
     p5.prototype.filter = function (operation, value) {
       Filters.apply(this.canvas, Filters[operation.toLowerCase()], value);
@@ -1931,7 +2221,7 @@ var imagepixels = function (require, core, filters, p5Color) {
           255
         ];
       }
-      var imageData = this.canvas.getContext('2d').getImageData(x, y, w, h);
+      var imageData = this.drawingContext.getImageData(x, y, w, h);
       var data = imageData.data;
       if (w === 1 && h === 1) {
         var pixels = [];
@@ -1950,13 +2240,13 @@ var imagepixels = function (require, core, filters, p5Color) {
     p5.prototype.loadPixels = function () {
       var width = this.width;
       var height = this.height;
-      var imageData = this.canvas.getContext('2d').getImageData(0, 0, width, height);
+      var imageData = this.drawingContext.getImageData(0, 0, width, height);
       this._setProperty('imageData', imageData);
       this._setProperty('pixels', imageData.data);
     };
     p5.prototype.set = function (x, y, imgOrCol) {
       if (imgOrCol instanceof p5.Image) {
-        this.canvas.getContext('2d').drawImage(imgOrCol.canvas, x, y);
+        this.drawingContext.drawImage(imgOrCol.canvas, x, y);
         this.loadPixels.call(this);
       } else {
         var idx = 4 * (y * this.width + x);
@@ -1997,7 +2287,7 @@ var imagepixels = function (require, core, filters, p5Color) {
         w = this.width;
         h = this.height;
       }
-      this.canvas.getContext('2d').putImageData(this.imageData, x, y, 0, 0, w, h);
+      this.drawingContext.putImageData(this.imageData, x, y, 0, 0, w, h);
     };
     return p5;
   }({}, core, filters, p5Color);
@@ -2486,9 +2776,76 @@ var inputfiles = function (require, core, reqwest) {
       req.send(null);
       return ret;
     };
-    p5.prototype.loadTable = function () {
-      throw 'not yet implemented';
+    p5.prototype.loadTable = function (path) {
+      var callback = null;
+      var options = [];
+      var header = false;
+      var sep = ',';
+      for (var i = 1; i < arguments.length; i++) {
+        if (typeof arguments[i] === 'function') {
+          callback = arguments[i];
+        } else if (typeof arguments[i] === 'string') {
+          options.push(arguments[i]);
+          if (arguments[i] === 'header') {
+            header = true;
+          }
+          if (arguments[i] === 'csv') {
+            sep = ',';
+          } else if (arguments[i] === 'tsv') {
+            sep = '\t';
+          }
+        }
+      }
+      var ret = [];
+      var t = new p5.Table();
+      var req = new XMLHttpRequest();
+      req.open('GET', path, true);
+      req.onreadystatechange = function () {
+        if (req.readyState === 4 && (req.status === 200 || req.status === 0)) {
+          var arr = req.responseText.match(/[^\r\n]+/g);
+          for (var k in arr) {
+            ret[k] = arr[k];
+          }
+          if (typeof callback !== 'undefined') {
+            var i, row;
+            if (header) {
+              t.columns = new p5.TableRow(ret[0]).arr;
+              for (i = 1; i < ret.length; i++) {
+                row = new p5.TableRow(ret[i], sep);
+                row.obj = makeObject(row.arr, t.columns);
+                t.addRow(row);
+              }
+            } else {
+              for (i = 0; i < ret[0].split(sep).length; i++) {
+                t.columns[i] = i.toString();
+              }
+              for (i = 0; i < ret.length; i++) {
+                row = new p5.TableRow(ret[i], sep);
+                t.addRow(row);
+              }
+            }
+            callback(t);
+          }
+        }
+      };
+      req.send(null);
+      return t;
     };
+    function makeObject(row, headers) {
+      var ret = {};
+      headers = headers || [];
+      if (typeof headers === 'undefined') {
+        for (var j = 0; j < row.length; j++) {
+          headers[j.toString()] = j;
+        }
+      }
+      for (var i = 0; i < headers.length; i++) {
+        var key = headers[i];
+        var val = row[i];
+        ret[key] = val;
+      }
+      return ret;
+    }
     p5.prototype.loadXML = function (path, callback) {
       var ret = [];
       reqwest({
@@ -2569,8 +2926,8 @@ var inputmouse = function (require, core, constants) {
     p5.prototype.pwinMouseX = 0;
     p5.prototype.pwinMouseY = 0;
     p5.prototype.mouseButton = 0;
-    p5.prototype.isMousePressed = false;
     p5.prototype.mouseIsPressed = false;
+    p5.prototype.isMousePressed = false;
     p5.prototype.updateMouseCoords = function (e) {
       var mousePos = getMousePos(this._curElement.elt, e);
       this._setProperty('pmouseX', this.mouseX);
@@ -2686,6 +3043,7 @@ var inputtouch = function (require, core) {
     var p5 = core;
     p5.prototype.touchX = 0;
     p5.prototype.touchY = 0;
+    p5.prototype.touches = [];
     p5.prototype.setTouchPoints = function (e) {
       var context = this._isGlobal ? window : this;
       context._setProperty('touchX', e.changedTouches[0].pageX);
@@ -3178,6 +3536,7 @@ var renderingrendering = function (require, core, constants) {
       var c = document.createElement('canvas');
       c.setAttribute('width', w * this._pixelDensity);
       c.setAttribute('height', h * this._pixelDensity);
+      c.setAttribute('style', 'width:' + w + 'px !important; height:' + h + 'px !important;');
       var node = this._userNode || document.body;
       node.appendChild(c);
       var pg = new p5.Graphics(c);
@@ -3196,7 +3555,7 @@ var renderingrendering = function (require, core, constants) {
     };
     p5.prototype.blendMode = function (mode) {
       if (mode === constants.BLEND || mode === constants.DARKEST || mode === constants.LIGHTEST || mode === constants.DIFFERENCE || mode === constants.MULTIPLY || mode === constants.EXCLUSION || mode === constants.SCREEN || mode === constants.REPLACE || mode === constants.OVERLAY || mode === constants.HARD_LIGHT || mode === constants.SOFT_LIGHT || mode === constants.DODGE || mode === constants.BURN) {
-        this.canvas.getContext('2d').globalCompositeOperation = mode;
+        this.drawingContext.globalCompositeOperation = mode;
       } else {
         throw new Error('Mode ' + mode + ' not recognized.');
       }
@@ -3212,7 +3571,7 @@ var shape2d_primitives = function (require, core, canvas, constants) {
       if (!this._doStroke && !this._doFill) {
         return;
       }
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       var vals = canvas.arcModeAdjust(x, y, width, height, this._ellipseMode);
       var radius = vals.h > vals.w ? vals.h / 2 : vals.w / 2, xScale = vals.h > vals.w ? vals.w / vals.h : 1, yScale = vals.h > vals.w ? 1 : vals.h / vals.w;
       ctx.scale(xScale, yScale);
@@ -3239,7 +3598,7 @@ var shape2d_primitives = function (require, core, canvas, constants) {
       if (!this._doStroke && !this._doFill) {
         return;
       }
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       var vals = canvas.modeAdjust(x, y, width, height, this._ellipseMode);
       var kappa = 0.5522848, ox = vals.w / 2 * kappa, oy = vals.h / 2 * kappa, xe = vals.x + vals.w, ye = vals.y + vals.h, xm = vals.x + vals.w / 2, ym = vals.y + vals.h / 2;
       ctx.beginPath();
@@ -3261,7 +3620,7 @@ var shape2d_primitives = function (require, core, canvas, constants) {
       if (!this._doStroke) {
         return;
       }
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       if (ctx.strokeStyle === 'rgba(0,0,0,0)') {
         return;
       }
@@ -3275,7 +3634,7 @@ var shape2d_primitives = function (require, core, canvas, constants) {
       if (!this._doStroke) {
         return;
       }
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       var s = ctx.strokeStyle;
       var f = ctx.fillStyle;
       if (s === 'rgba(0,0,0,0)') {
@@ -3298,7 +3657,7 @@ var shape2d_primitives = function (require, core, canvas, constants) {
       if (!this._doStroke && !this._doFill) {
         return;
       }
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
@@ -3318,7 +3677,7 @@ var shape2d_primitives = function (require, core, canvas, constants) {
         return;
       }
       var vals = canvas.modeAdjust(a, b, c, d, this._rectMode);
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       if (this._doStroke && ctx.lineWidth % 2 === 1) {
         ctx.translate(0.5, 0.5);
       }
@@ -3339,7 +3698,7 @@ var shape2d_primitives = function (require, core, canvas, constants) {
       if (!this._doStroke && !this._doFill) {
         return;
       }
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
@@ -3368,8 +3727,8 @@ var shapeattributes = function (require, core, constants) {
       return this;
     };
     p5.prototype.noSmooth = function () {
-      this.canvas.getContext('2d').mozImageSmoothingEnabled = false;
-      this.canvas.getContext('2d').webkitImageSmoothingEnabled = false;
+      this.drawingContext.mozImageSmoothingEnabled = false;
+      this.drawingContext.webkitImageSmoothingEnabled = false;
       return this;
     };
     p5.prototype.rectMode = function (m) {
@@ -3379,27 +3738,27 @@ var shapeattributes = function (require, core, constants) {
       return this;
     };
     p5.prototype.smooth = function () {
-      this.canvas.getContext('2d').mozImageSmoothingEnabled = true;
-      this.canvas.getContext('2d').webkitImageSmoothingEnabled = true;
+      this.drawingContext.mozImageSmoothingEnabled = true;
+      this.drawingContext.webkitImageSmoothingEnabled = true;
       return this;
     };
     p5.prototype.strokeCap = function (cap) {
       if (cap === constants.ROUND || cap === constants.SQUARE || cap === constants.PROJECT) {
-        this.canvas.getContext('2d').lineCap = cap;
+        this.drawingContext.lineCap = cap;
       }
       return this;
     };
     p5.prototype.strokeJoin = function (join) {
       if (join === constants.ROUND || join === constants.BEVEL || join === constants.MITER) {
-        this.canvas.getContext('2d').lineJoin = join;
+        this.drawingContext.lineJoin = join;
       }
       return this;
     };
     p5.prototype.strokeWeight = function (w) {
       if (typeof w === 'undefined' || w === 0) {
-        this.canvas.getContext('2d').lineWidth = 0.0001;
+        this.drawingContext.lineWidth = 0.0001;
       } else {
-        this.canvas.getContext('2d').lineWidth = w;
+        this.drawingContext.lineWidth = w;
       }
       return this;
     };
@@ -3414,7 +3773,7 @@ var shapecurves = function (require, core) {
       if (!this._doStroke) {
         return;
       }
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       for (var i = 0; i <= this._bezierDetail; i++) {
@@ -3442,7 +3801,7 @@ var shapecurves = function (require, core) {
       if (!this._doStroke) {
         return;
       }
-      var ctx = this.canvas.getContext('2d');
+      var ctx = this.drawingContext;
       ctx.moveTo(x1, y1);
       ctx.beginPath();
       for (var i = 0; i <= this._curveDetail; i++) {
@@ -3493,7 +3852,7 @@ var shapevertex = function (require, core, constants) {
         this._shapeKind = null;
       }
       this._shapeInited = true;
-      this.canvas.getContext('2d').beginPath();
+      this.drawingContext.beginPath();
       return this;
     };
     p5.prototype.bezierVertex = function (x2, y2, x3, y3, x4, y4) {
@@ -3509,7 +3868,7 @@ var shapevertex = function (require, core, constants) {
         this._contourVertices.push(pt);
         return this;
       }
-      this.canvas.getContext('2d').bezierCurveTo(x2, y2, x3, y3, x4, y4);
+      this.drawingContext.bezierCurveTo(x2, y2, x3, y3, x4, y4);
       return this;
     };
     p5.prototype.curveVertex = function (x, y) {
@@ -3525,8 +3884,8 @@ var shapevertex = function (require, core, constants) {
     };
     p5.prototype.endContour = function () {
       this._contourVertices.reverse();
-      this.canvas.getContext('2d').moveTo(this._contourVertices[0].x, this._contourVertices[0].y);
-      var ctx = this.canvas.getContext('2d');
+      this.drawingContext.moveTo(this._contourVertices[0].x, this._contourVertices[0].y);
+      var ctx = this.drawingContext;
       this._contourVertices.slice(1).forEach(function (pt, i) {
         switch (pt.type) {
         case constants.LINEAR:
@@ -3542,19 +3901,19 @@ var shapevertex = function (require, core, constants) {
           break;
         }
       });
-      this.canvas.getContext('2d').closePath();
+      this.drawingContext.closePath();
       this._contourInited = false;
       return this;
     };
     p5.prototype.endShape = function (mode) {
       if (mode === constants.CLOSE) {
-        this.canvas.getContext('2d').closePath();
+        this.drawingContext.closePath();
         if (this._doFill) {
-          this.canvas.getContext('2d').fill();
+          this.drawingContext.fill();
         }
       }
       if (this._doStroke && this._curveVertices.length <= 0) {
-        this.canvas.getContext('2d').stroke();
+        this.drawingContext.stroke();
       } else {
         this._curveVertices = [];
       }
@@ -3571,7 +3930,7 @@ var shapevertex = function (require, core, constants) {
         this._contourVertices.push(pt);
         return this;
       }
-      this.canvas.getContext('2d').quadraticCurveTo(cx, cy, x3, y3);
+      this.drawingContext.quadraticCurveTo(cx, cy, x3, y3);
       return this;
     };
     p5.prototype.vertex = function (x, y) {
@@ -3584,9 +3943,9 @@ var shapevertex = function (require, core, constants) {
         return this;
       }
       if (this._shapeInited) {
-        this.canvas.getContext('2d').moveTo(x, y);
+        this.drawingContext.moveTo(x, y);
       } else {
-        this.canvas.getContext('2d').lineTo(x, y);
+        this.drawingContext.lineTo(x, y);
       }
       this._shapeInited = false;
       return this;
@@ -3610,20 +3969,15 @@ var structure = function (require, core) {
       this._draw();
     };
     p5.prototype.push = function () {
-      var ctx = this.canvas.getContext('2d');
-      ctx.save();
+      this.drawingContext.save();
       this.styles.push({
-        fillStyle: ctx.fillStyle,
-        strokeStyle: ctx.strokeStyle,
-        lineWidth: ctx.lineWidth,
-        lineCap: ctx.lineCap,
-        lineJoin: ctx.lineJoin,
+        doStroke: this._doStroke,
+        doFill: this._doFill,
         tint: this._tint,
         imageMode: this._imageMode,
         rectMode: this._rectMode,
         ellipseMode: this._ellipseMode,
         colorMode: this._colorMode,
-        textAlign: ctx.textAlign,
         textFont: this.textFont,
         textLeading: this.textLeading,
         textSize: this.textSize,
@@ -3631,20 +3985,15 @@ var structure = function (require, core) {
       });
     };
     p5.prototype.pop = function () {
-      var ctx = this.canvas.getContext('2d');
-      ctx.restore();
+      this.drawingContext.restore();
       var lastS = this.styles.pop();
-      ctx.fillStyle = lastS.fillStyle;
-      ctx.strokeStyle = lastS.strokeStyle;
-      ctx.lineWidth = lastS.lineWidth;
-      ctx.lineCap = lastS.lineCap;
-      ctx.lineJoin = lastS.lineJoin;
+      this._doStroke = lastS.doStroke;
+      this._doFill = lastS.doFill;
       this._tint = lastS.tint;
       this._imageMode = lastS.imageMode;
       this._rectMode = lastS.rectMode;
       this._ellipseMode = lastS.ellipseMode;
       this._colorMode = lastS.colorMode;
-      ctx.textAlign = lastS.textAlign;
       this.textFont = lastS.textFont;
       this.textLeading = lastS.textLeading;
       this.textSize = lastS.textSize;
@@ -3680,7 +4029,7 @@ var transform = function (require, core, constants, outputtext_area) {
         0
       ]];
     p5.prototype.applyMatrix = function (n00, n01, n02, n10, n11, n12) {
-      this.canvas.getContext('2d').transform(n00, n01, n02, n10, n11, n12);
+      this.drawingContext.transform(n00, n01, n02, n10, n11, n12);
       var m = this._matrices[this._matrices.length - 1];
       m = multiplyMatrix(m, [
         n00,
@@ -3702,7 +4051,7 @@ var transform = function (require, core, constants, outputtext_area) {
       throw new Error('pushMatrix() not used, see push()');
     };
     p5.prototype.resetMatrix = function () {
-      this.canvas.getContext('2d').setTransform();
+      this.drawingContext.setTransform();
       this._matrices[this._matrices.length - 1] = [
         1,
         0,
@@ -3717,7 +4066,7 @@ var transform = function (require, core, constants, outputtext_area) {
       if (this._angleMode === constants.DEGREES) {
         r = this.radians(r);
       }
-      this.canvas.getContext('2d').rotate(r);
+      this.drawingContext.rotate(r);
       var m = this._matrices[this._matrices.length - 1];
       var c = Math.cos(r);
       var s = Math.sin(r);
@@ -3745,7 +4094,7 @@ var transform = function (require, core, constants, outputtext_area) {
         x = arguments[0];
         y = arguments[1];
       }
-      this.canvas.getContext('2d').scale(x, y);
+      this.drawingContext.scale(x, y);
       var m = this._matrices[this._matrices.length - 1];
       m[0] *= x;
       m[1] *= x;
@@ -3757,7 +4106,7 @@ var transform = function (require, core, constants, outputtext_area) {
       if (this._angleMode === constants.DEGREES) {
         angle = this.radians(angle);
       }
-      this.canvas.getContext('2d').transform(1, 0, this.tan(angle), 1, 0, 0);
+      this.drawingContext.transform(1, 0, this.tan(angle), 1, 0, 0);
       var m = this._matrices[this._matrices.length - 1];
       m = multiplyMatrix(m, [
         1,
@@ -3773,7 +4122,7 @@ var transform = function (require, core, constants, outputtext_area) {
       if (this._angleMode === constants.DEGREES) {
         angle = this.radians(angle);
       }
-      this.canvas.getContext('2d').transform(1, this.tan(angle), 0, 1, 0, 0);
+      this.drawingContext.transform(1, this.tan(angle), 0, 1, 0, 0);
       var m = this._matrices[this._matrices.length - 1];
       m = multiplyMatrix(m, [
         1,
@@ -3786,7 +4135,7 @@ var transform = function (require, core, constants, outputtext_area) {
       return this;
     };
     p5.prototype.translate = function (x, y) {
-      this.canvas.getContext('2d').translate(x, y);
+      this.drawingContext.translate(x, y);
       var m = this._matrices[this._matrices.length - 1];
       m[4] += m[0] * x + m[2] * y;
       m[5] += m[1] * x + m[3] * y;
@@ -3821,11 +4170,11 @@ var typographyattributes = function (require, core, constants) {
     p5.prototype._textStyle = constants.NORMAL;
     p5.prototype.textAlign = function (a) {
       if (a === constants.LEFT || a === constants.RIGHT || a === constants.CENTER) {
-        this.canvas.getContext('2d').textAlign = a;
+        this.drawingContext.textAlign = a;
       }
     };
     p5.prototype.textHeight = function (s) {
-      return this.canvas.getContext('2d').measureText(s).height;
+      return this.drawingContext.measureText(s).height;
     };
     p5.prototype.textLeading = function (l) {
       this._setProperty('_textLeading', l);
@@ -3839,7 +4188,7 @@ var typographyattributes = function (require, core, constants) {
       }
     };
     p5.prototype.textWidth = function (s) {
-      return this.canvas.getContext('2d').measureText(s).width;
+      return this.drawingContext.measureText(s).width;
     };
     return p5;
   }({}, core, constants);
@@ -3848,10 +4197,14 @@ var typographyloading_displaying = function (require, core, canvas) {
     var p5 = core;
     var canvas = canvas;
     p5.prototype.text = function () {
-      this.canvas.getContext('2d').font = this._textStyle + ' ' + this._textSize + 'px ' + this._textFont;
+      this.drawingContext.font = this._textStyle + ' ' + this._textSize + 'px ' + this._textFont;
       if (arguments.length === 3) {
-        this.canvas.getContext('2d').fillText(arguments[0], arguments[1], arguments[2]);
-        this.canvas.getContext('2d').strokeText(arguments[0], arguments[1], arguments[2]);
+        if (this._doFill) {
+          this.drawingContext.fillText(arguments[0], arguments[1], arguments[2]);
+        }
+        if (this._doStroke) {
+          this.drawingContext.strokeText(arguments[0], arguments[1], arguments[2]);
+        }
       } else if (arguments.length === 5) {
         var words = arguments[0].split(' ');
         var line = '';
@@ -3859,13 +4212,17 @@ var typographyloading_displaying = function (require, core, canvas) {
         vals.y += this._textLeading;
         for (var n = 0; n < words.length; n++) {
           var testLine = line + words[n] + ' ';
-          var metrics = this.canvas.getContext('2d').measureText(testLine);
+          var metrics = this.drawingContext.measureText(testLine);
           var testWidth = metrics.width;
           if (vals.y > vals.h) {
             break;
           } else if (testWidth > vals.w && n > 0) {
-            this.canvas.getContext('2d').fillText(line, vals.x, vals.y);
-            this.canvas.getContext('2d').strokeText(line, vals.x, vals.y);
+            if (this._doFill) {
+              this.drawingContext.fillText(line, vals.x, vals.y);
+            }
+            if (this._doStroke) {
+              this.drawingContext.strokeText(line, vals.x, vals.y);
+            }
             line = words[n] + ' ';
             vals.y += this._textLeading;
           } else {
@@ -3873,8 +4230,12 @@ var typographyloading_displaying = function (require, core, canvas) {
           }
         }
         if (vals.y <= vals.h) {
-          this.canvas.getContext('2d').fillText(line, vals.x, vals.y);
-          this.canvas.getContext('2d').strokeText(line, vals.x, vals.y);
+          if (this._doFill) {
+            this.drawingContext.fillText(line, vals.x, vals.y);
+          }
+          if (this._doStroke) {
+            this.drawingContext.strokeText(line, vals.x, vals.y);
+          }
         }
       }
     };
@@ -3883,7 +4244,7 @@ var typographyloading_displaying = function (require, core, canvas) {
     };
     return p5;
   }({}, core, canvas);
-var src_app = function (require, core, p5Color, p5Element, p5Graphics, p5Image, p5Vector, colorcreating_reading, colorsetting, constants, dataarray_functions, datastring_functions, environment, imageimage, imageloading_displaying, imagepixels, inputfiles, inputkeyboard, inputmouse, inputtime_date, inputtouch, mathmath, mathcalculation, mathrandom, mathnoise, mathtrigonometry, outputfiles, outputimage, outputtext_area, renderingrendering, shape2d_primitives, shapeattributes, shapecurves, shapevertex, structure, transform, typographyattributes, typographyloading_displaying) {
+var src_app = function (require, core, p5Color, p5Element, p5Graphics, p5Image, p5Vector, p5TableRow, p5Table, colorcreating_reading, colorsetting, constants, dataarray_functions, datastring_functions, environment, imageimage, imageloading_displaying, imagepixels, inputfiles, inputkeyboard, inputmouse, inputtime_date, inputtouch, mathmath, mathcalculation, mathrandom, mathnoise, mathtrigonometry, outputfiles, outputimage, outputtext_area, renderingrendering, shape2d_primitives, shapeattributes, shapecurves, shapevertex, structure, transform, typographyattributes, typographyloading_displaying) {
     'use strict';
     var p5 = core;
     var _globalInit = function () {
@@ -3900,4 +4261,4 @@ var src_app = function (require, core, p5Color, p5Element, p5Graphics, p5Image, 
     }
     window.p5 = p5;
     return p5;
-  }({}, core, p5Color, p5Element, p5Graphics, p5Image, p5Vector, colorcreating_reading, colorsetting, constants, dataarray_functions, datastring_functions, environment, imageimage, imageloading_displaying, imagepixels, inputfiles, inputkeyboard, inputmouse, inputtime_date, inputtouch, mathmath, mathcalculation, mathrandom, mathnoise, mathtrigonometry, outputfiles, outputimage, outputtext_area, renderingrendering, shape2d_primitives, shapeattributes, shapecurves, shapevertex, structure, transform, typographyattributes, typographyloading_displaying);
+  }({}, core, p5Color, p5Element, p5Graphics, p5Image, p5Vector, p5TableRow, p5Table, colorcreating_reading, colorsetting, constants, dataarray_functions, datastring_functions, environment, imageimage, imageloading_displaying, imagepixels, inputfiles, inputkeyboard, inputmouse, inputtime_date, inputtouch, mathmath, mathcalculation, mathrandom, mathnoise, mathtrigonometry, outputfiles, outputimage, outputtext_area, renderingrendering, shape2d_primitives, shapeattributes, shapecurves, shapevertex, structure, transform, typographyattributes, typographyloading_displaying);

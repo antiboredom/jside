@@ -5,7 +5,8 @@ var defaults = {
   theme: 'tomorrow',
   consoleOrientation: 'horizontal',
   showLibs: false,
-  wordWrap: false
+  wordWrap: false,
+  runInBrowser: false
 };
 
 module.exports.load = function() {
