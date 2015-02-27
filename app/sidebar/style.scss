@@ -2,7 +2,7 @@ $light-gray-1: #eeeceb;
 $light-gray-2: #e1dedc;
 $light-gray-3: #c8c5c2;
 $med-gray: #959595;
-$dark-gray: #58585b;
+$dark-gray: #333333;
 
 #sidebar-container {
   -webkit-user-select: none;
@@ -53,14 +53,14 @@ $dark-gray: #58585b;
   outline: 0;
 
   &:hover {
-    background-image: url('../images/play-green.svg');
+    background-image: url('../images/play-pink.svg');
   }
 
   &.running {
     background-image: url('../images/stop-gray.svg');
 
     &:hover {
-      background-image: url('../images/stop-red.svg');
+      background-image: url('../images/stop-orange.svg');
     }
   }
 }
@@ -123,7 +123,7 @@ $dark-gray: #58585b;
 #project-name {
   padding-left: 20px;
   font-size: 24px;
-  color: $dark-gray;
+  color: #ed225d;
   font-weight: bold;
   // text-shadow: 0px 1px #E1DEDC;
   margin-left: 36px;
