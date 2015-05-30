@@ -19,7 +19,8 @@ module.exports.load = function(callback) {
         });
         win.on('document-start', function(){
           win.window.PATH = w.path;
-          win.window.UNSAVED = w.temp
+          win.window.FILEPATH = w.filePath;
+          win.window.UNSAVED = w.temp;
           openedWindows ++;
 
           if (openedWindows === windows.length) {
@@ -41,7 +42,8 @@ module.exports.save = function(app, win) {
     width: win.width,
     height: win.height,
     temp: app.temp,
-    path: app.currentFile && app.currentFile.path ? app.currentFile.path : app.projectPath
+    path: app.projectPath,
+    filePath: app.currentFile && app.currentFile.path ? app.currentFile.path : null
   };
   var windows = JSON.parse(localStorage.windows);
   windows.push(state);

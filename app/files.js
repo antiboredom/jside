@@ -58,7 +58,7 @@ var Files = {
   },
 
   find: function(files, path) {
-    var result = undefined;
+    var result = null;
     _find(files, path);
     return result;
 

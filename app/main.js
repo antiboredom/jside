@@ -77,10 +77,20 @@ var appConfig = {
         this.projectPath = Path.dirname(this.projectPath);
       }
 
+      if (window.FILEPATH && fs.lstatSync(window.FILEPATH).isFile()) {
+        filename = window.FILEPATH;
+      }
+
       // load the project and open the selected file
       var self = this;
       this.loadProject(this.projectPath, function(){
-        if (filename) self.openFile(filename);
+        if (filename) {
+          if (Path.dirname(filename) === self.projectPath) {
+            self.openFile(filename);
+          } else {
+            self.$broadcast('open-nested-file', filename);
+          }
+        }
         gui.Window.get().show();
       });
 
@@ -259,8 +269,7 @@ var appConfig = {
         if (self.justSaved) {
           self.justSaved = false; 
         } else {
-          self.askReload = true;
-        
+          if (!self.temp) self.askReload = true;
         }
       });
     },
@@ -275,8 +284,7 @@ var appConfig = {
         gui.Window.get().close();
       } else {
         if (this.outputWindow) {
-          this.outputWindow.close(true);
-          this.outputWindow = null;
+          this.toggleRun();
         }
       }
     },
@@ -343,6 +351,19 @@ var appConfig = {
         // otherwise just write the current file
         this.writeFile();
       }
+    },
+
+    saveFileAs: function(path) {
+      var originalName = Path.basename(path);
+      var newName = prompt('Save file as:', originalName);
+      if (!newName || newName === originalName) return false;
+
+      var self = this;
+      var filename = Path.join(Path.dirname(path), newName);
+      fs.writeFile(filename, this.currentFile.contents, 'utf8', function(err){
+        var f = Files.setup(filename);
+        self.openFile(filename);
+      });
     },
 
     writeFile: function() {
