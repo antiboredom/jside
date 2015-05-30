@@ -10,7 +10,7 @@ module.exports = {
   template: require('./sidebar.html'),
 
   data: {
-    sidebarWidth: 160
+    sidebarWidth: undefined
   },
   
   computed: {
@@ -23,7 +23,7 @@ module.exports = {
         ace.resize();
         return "expanded";
       } else {
-        this.sidebarWidth = container.width() < 160 ? 160 : container.width();
+        this.sidebarWidth = container.width();
         container.css({
           width: 10
         });
@@ -35,6 +35,8 @@ module.exports = {
 
   ready: function() {
     this.$on('open-nested-file', this.openNestedFile);
+    var container = $('#sidebar-container');
+    this.sidebarWidth = container.width();
   },
 
   components: {

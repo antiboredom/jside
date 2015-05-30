@@ -4,6 +4,7 @@ var os = nodeRequire('os');
 var fs = nodeRequire('fs');
 var Files = require('../../files');
 
+
 module.exports = {
   newProject: function() {
     //copy the empty project folder to a temporary directory

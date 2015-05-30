@@ -4,13 +4,20 @@
   $med-gray: #959595;
   $dark-gray: #58585b;
 
+#side-container {
+  flex-direction: column;
+  display: flex;
+}
+
   #sidebar-container {
     -webkit-user-select: none;
     visibility: hidden;
-    display: flex;
     position: relative;
     width: 10px;  
     margin-top: 120px;
+    margin-bottom: 30px;
+    flex: 1;
+    overflow-y: auto;
   }
 
   #sidebar-container.expanded{
@@ -59,8 +66,7 @@
 
 
   #filetree {
-    margin-left: 12px;
-    overflow: auto;
+    overflow-x: auto;
     flex: 1;
 
     ul {
@@ -72,12 +78,14 @@
         margin: 0;
         padding: 0;
         position: relative;
-
+       
         div {
           padding: 3px;
           padding-left: 64px;
+          margin-left:10px;
           cursor: pointer;
           color: $dark-gray;
+          min-width: 60px;
         }
 
         div.selected {
@@ -88,6 +96,7 @@
         ul li {
           div {
             padding-left: 85px;
+
           }
 
           ul li {

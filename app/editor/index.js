@@ -6,6 +6,7 @@ var beautify = require('js-beautify').js_beautify;
 var beautify_css = require('js-beautify').css;
 var beautify_html = require('js-beautify').html;
 var ace = require('brace');
+
 require('brace/mode/html');
 require('brace/mode/javascript');
 require('brace/mode/css');
@@ -57,6 +58,8 @@ module.exports = {
         doc.on('change', function() {
           var file = Files.find(self.$root.files, fileObject.path);
           if (file) file.contents = doc.getValue();
+                    
+
         });
 
         var session = {

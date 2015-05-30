@@ -19,6 +19,7 @@ callback([encoding])}};function encodeAsString(obj){var str="";var nsp=false;str
     };
   });
 
+
   window.onerror = function (msg, url, num, column, errorObj) {
     socket.emit('console', { num: num, msg: msg, type: 'error' });
     return false;
