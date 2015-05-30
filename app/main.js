@@ -3,6 +3,7 @@ var Path = nodeRequire('path');
 var fs = nodeRequire('fs');
 var os = nodeRequire('os');
 var chokidar = nodeRequire('chokidar');
+var rimdir = nodeRequire('rimraf');
 
 // front-end modules
 var Vue = require('vue');
@@ -319,7 +320,19 @@ var appConfig = {
 
     saveProjectAs: function(event) {
       var path = event.target.files[0].path;
-      this.modeFunction('saveAs', path);
+      var self = this
+      fs.exists(path, function(existing){
+        if (existing) {
+          rimdir(path, function(error){
+            if (error) throw error;
+            //console.log(path + " already exists. deleting...");
+            self.modeFunction('saveAs', path);
+          })
+        } else {
+          //console.log(path + " is clear to save");
+          self.modeFunction('saveAs', path);
+        }
+      })
     },
 
     saveFile: function() {
