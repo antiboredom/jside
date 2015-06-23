@@ -5,4 +5,5 @@ dist/
 cache/
 public/js/main.js
 public/css
+public/npm-debug.log
 .DS_Store

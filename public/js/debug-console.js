@@ -5,6 +5,68 @@ callback([encoding])}};function encodeAsString(obj){var str="";var nsp=false;str
 (function() {
 
   var socket = io.connect(window.location.origin);
+
+  //when recieved a list of global function changes from editor, apply them. 
+  socket.on('codechange', function(change) {
+  	var value = change.value;
+
+  	if(change.type==='function') {
+  		var bodyWithoutBrace = change.value.substring(1, change.value.length-1);
+  		value = new Function(change.params, bodyWithoutBrace);
+  		/*
+  		// using eval
+  		value = 'function() ' + change.value;
+  		*/
+  	}
+  	else if(change.type==='number') {
+  		 value = parseFloat(change.value);
+  	}
+  	else if(change.type==='object') {
+  		//handling object literals (JSON.parse doesn't work becuase of "s)
+  		value = eval('('+change.value+')'); 
+  	}
+
+
+  	if(change.type==='function' && change.name==='setup') {
+  		//TODO display a message saying setup method is not live (because 1. its hard to implement 2. it doesn't make sense)
+  	}
+  	else {
+  		if(change.type==='function') {
+  			//this carches errors in functions (draw or methods called by error)
+  			//it has side effecs (e.g. it being called may change the state of application)
+	  		try {
+	  			value.call(window);
+	  		}
+	  		catch(e) {
+	  			console.error(e.message);
+	  			return;
+	  		}
+	  	}
+  		setWindowPropByPath(change.name, value);
+  		
+  		/*
+  		//using eval 
+  		var toEval = change.name + ' = ' + value;
+  		eval(toEval);
+  		*/
+
+  	}
+
+  });
+
+	function setWindowPropByPath(path, value) {
+	    var schema = window;  
+	    var pList = path.split('.');
+	    var len = pList.length;
+	    for(var i = 0; i < len-1; i++) {
+	        var elem = pList[i];
+	        if( !schema[elem] ) schema[elem] = {}
+	        schema = schema[elem];
+	    }
+
+	    schema[pList[len-1]] = value;
+	}
+
   var original = window.console;
   window.console = {};
 

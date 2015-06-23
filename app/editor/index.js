@@ -58,8 +58,9 @@ module.exports = {
         doc.on('change', function() {
           var file = Files.find(self.$root.files, fileObject.path);
           if (file) file.contents = doc.getValue();
-                    
-
+          
+          self.$root.modeFunction('codeChanged', file.contents);
+          
         });
 
         var session = {
