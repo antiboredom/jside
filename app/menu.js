@@ -106,6 +106,10 @@ module.exports.setup = function(app) {
     app.showHelp();
   }}));
 
+  help.append(new gui.MenuItem({ label: 'Credits', click: function(){
+      app.toggleCreditsPane();
+  }}));
+
   view.append(new gui.MenuItem({ label: 'Show Sketch Folder',
       modifiers: 'cmd', key: 'k', click: function(){
         gui.Shell.showItemInFolder(app.projectPath);

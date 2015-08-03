@@ -168,7 +168,9 @@ module.exports = {
     }
   },
 
-  referenceURL: 'http://p5js.org/reference/'
+  referenceURL: 'http://p5js.org/reference/',
+  p5jsURL: 'http://p5js.org/',
+  processingURL: 'https://github.com/processing'
 
 };
 

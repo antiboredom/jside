@@ -1,0 +1,27 @@
+<div id="creditsPane" class="creditsPane">
+  <div id="titleBar" class="titleBar">
+    <h2>Credits</h2>
+    <div id="close" v-on="click: $root.toggleCreditsPane()">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="x" x="0" y="0" viewBox="111.98 169.64 388.04 407.06" enable-background="new 111.982048 169.6423035 388.0419922 407.0557861" xml:space="preserve"><path d="M326.08 360.51L392.7 293.88c6.42-6.42 6.42-16.81 0-23.23 -6.42-6.42-16.81-6.42-23.23 0l-66.63 66.63 -66.63-66.63c-6.42-6.42-16.81-6.42-23.23 0s-6.42 16.81 0 23.23l66.63 66.63 -66.63 66.63c-6.42 6.42-6.42 16.81 0 23.23 3.21 3.21 7.41 4.81 11.61 4.81 4.2 0 8.41-1.6 11.61-4.81l66.63-66.63 66.63 66.63c3.21 3.21 7.41 4.81 11.61 4.81 4.2 0 8.41-1.6 11.61-4.81 6.42-6.42 6.42-16.81 0-23.23L326.08 360.51z" ></svg>
+    </div>
+  </div>
+  <div class="content">
+    <div class="logo">
+      <img class="p5" src="images/p5.svg">
+    </div>
+    <article class="credits">
+      <header>
+        <h1>p5.js Editor</h1>
+        <h3>Version: <span class="version" v-model="version"></span></h3>
+      </header>
+      <section>
+        <p>A Mac code editor designed for <a href="#" v-on="click: $root.openP5js()">p5.js</a></p>
+        <p>A project of <a href="#" v-on="click: $root.openProcessing()">Processing Fundation</a></p>
+
+        <p>Contributors</p>
+        <div id="contributors" class="contributors"></div>
+      </section>
+
+    </article>
+  </div>
+</div>

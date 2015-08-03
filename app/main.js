@@ -16,6 +16,7 @@ var menu = require('./menu');
 var windowstate = require('./windowstate');
 var updater = require('./updater');
 var settings = require('./settings');
+var credits = require('./credits');
 var modes = {
   p5: require('./modes/p5/p5-mode')
 };
@@ -31,6 +32,7 @@ var appConfig = {
     editor: require('./editor/index'),
     sidebar: require('./sidebar/index'),
     settings: require('./settings/index'),
+    credits: require('./credits/index'),
     debug: require('./debug/index'),
     tabs: require('./tabs/index')
   },
@@ -45,6 +47,7 @@ var appConfig = {
     focused: false,
     settings: {},
     showSettings: false,
+    showCredits: false,
     files: [],
     tabs: [],
     justSaved: false,
@@ -290,7 +293,7 @@ var appConfig = {
         Files.removeFromTree(path, self.files);
       }).on('change', function(path) {
         if (self.justSaved) {
-          self.justSaved = false; 
+          self.justSaved = false;
         } else {
           if (!self.temp) self.askReload = true;
         }
@@ -368,8 +371,6 @@ var appConfig = {
       });
     },
 
-   
-
     saveFile: function() {
       // if this is a new project then trigger a save-as
       if (this.temp) {
@@ -433,12 +434,11 @@ var appConfig = {
         }
       }
     },
-    
+
     closeFile: function(path){
         // check to see if there are unsaved files
          var file = Files.find(this.files, path);
         if (!file) return false;
-        
 
         if(this.tabs.length==1){
             var win = gui.Window.get();
@@ -451,7 +451,7 @@ var appConfig = {
         }
         if (shouldClose) {
           file.open = false;
-          file.contents = file.originalContents; 
+          file.contents = file.originalContents;
           this.$broadcast('close-file', file);
           return true;
         }
@@ -546,6 +546,25 @@ var appConfig = {
 
     toggleSettingsPane: function() {
       this.showSettings = !this.showSettings;
+    },
+
+    toggleCreditsPane: function() {
+      this.showCredits = !this.showCredits;
+    },
+
+    openP5js: function() {
+      gui.Shell.openExternal(this.$options.mode.p5jsURL);
+
+    },
+
+    openProcessing: function() {
+      gui.Shell.openExternal(this.$options.mode.processingURL);
+    },
+
+
+    openExternalURL: function(url) {
+      alert(url);
+//      gui.Shell.openExternal(url);
     },
 
     toggleSidebar: function() {
