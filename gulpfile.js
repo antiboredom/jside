@@ -15,16 +15,19 @@ var fs = require('fs');
 var info = require('./package.json');
 var request = require('request');
 
+var isWin = process.platform.indexOf('win') > -1;
+
 var builderOptions = {
   version: info.devDependencies.nw,
   buildType: 'versioned',
   files: [ './public/**'],
   buildDir: './dist',
-  platforms: ['osx64'],
-  macIcns: './icons/p5js.icns'
+  platforms: ['osx64', 'win64'],
+  macIcns: './icons/p5js.icns',
+  winIco: './icons/p5js.ico'
 };
 
-var binaryDir = Path.join(builderOptions.buildDir, info.name + " - v" + info.version, 'osx64');
+var binaryDir = Path.join(builderOptions.buildDir, info.name + " - v" + info.version);
 var latestDir = Path.join(Path.join(builderOptions.buildDir, 'latest'));
 
 var jsPath = ['./app/*.js', './app/**/*.js', './app/**/*.html', './public/index.html'];
@@ -89,17 +92,28 @@ function build (cb) {
 function copyFfmpegBuild() {
   console.log('copying ffmpegsumo.so to ./dist');
   gulp.src('./lib/ffmpegsumo.so')
-    .pipe(gulp.dest('./dist/p5 - v0.1.8/osx64/p5.app/Contents/Frameworks/nwjs Framework.framework/Libraries',
+    .pipe(gulp.dest(binaryDir + '/osx64/p5.app/Contents/Frameworks/nwjs Framework.framework/Libraries',
+       {overwrite: true}));
+
+  console.log('copying ffmpegsumo.dll to ./dist');
+  gulp.src('./lib/ffmpegsumo.so')
+    .pipe(gulp.dest(binaryDir + '/win64',
        {overwrite: true}));
 }
 
 
 // copies the ffmpegsumo.so with mp3/mp4 decoders to nwjs directory for development, assuming npm is already run
 gulp.task('copy-ffmpeg-default', function() {
-  console.log('copying ffmpegsumo.so to ./node_modules');
-  gulp.src('./lib/ffmpegsumo.so')
-    .pipe(gulp.dest('./node_modules/nw/nwjs/nwjs.app/Contents/Frameworks/nwjs Framework.framework/Libraries/',
-       {overwrite: true}));
+  console.log('copying ffmpegsumo to ./node_modules');
+  if (isWin) {
+    gulp.src('./lib/ffmpegsumo.dll')
+      .pipe(gulp.dest('./node_modules/nw/nwjs/',
+         {overwrite: true}));
+  } else {
+    gulp.src('./lib/ffmpegsumo.so')
+      .pipe(gulp.dest('./node_modules/nw/nwjs/nwjs.app/Contents/Frameworks/nwjs Framework.framework/Libraries/',
+         {overwrite: true}));
+    }
 });
 
 
@@ -108,12 +122,16 @@ gulp.task('copy-ffmpeg-default', function() {
 function latest () {
   console.log('Compressing...');
 
-  return gulp.src(binaryDir + '/**').
-    pipe(zip('p5.zip')).
-    pipe(gulp.dest(latestDir)).
-    on('end', function(){
-      console.log('Build compressed');
-    });
+  builderOptions.platforms.forEach(function(p){
+    var output = 'p5-' + (p.indexOf('win') > -1 ? 'win' : 'mac') + '.zip';
+    gulp.src(binaryDir + '/' + p +'/**').
+      pipe(zip(output)).
+      pipe(gulp.dest(latestDir)).
+      on('end', function(){
+        console.log('Build compressed');
+      });
+
+  });
 }
 
 gulp.task('p5', function () {

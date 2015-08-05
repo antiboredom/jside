@@ -12,7 +12,7 @@ module.exports.check = function() {
     if (semver.gt(data.version, manifest.version)) {
       var shouldDownload = confirm('A newer version of P5 is available. Do you want to download it?');
       if (shouldDownload) {
-        gui.Shell.openExternal(downloadURL + 'v' + data.version + '/p5.zip');
+        gui.Shell.openExternal(downloadURL + 'v' + data.version + '/p5-' + (isWin ? 'win' : 'mac') + '.zip');
       }
     }
   }

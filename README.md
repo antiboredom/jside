@@ -1,4 +1,4 @@
-## p5.js Editor: a Mac code editor designed for p5.js
+## p5.js Editor: a code editor designed for p5.js
 
 The p5.js Editor is a simple coding environment designed for new programmers to get started with p5.js. It's modeled off of the Processing editor, and intended to provide a similar experience.
 
@@ -13,7 +13,7 @@ The p5.js Editor is a simple coding environment designed for new programmers to 
 * Provides a basic logging console
 
 ### Future Plans
-* Windows & Linux versions
+* Linux version
 * Integrated p5.js documentation
 * Update sketches live
 

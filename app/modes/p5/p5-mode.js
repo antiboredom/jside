@@ -9,7 +9,7 @@ var Files = require('../../files');
 module.exports = {
   newProject: function() {
     //copy the empty project folder to a temporary directory
-    var emptyProject = 'mode_assets/p5/empty_project';
+    var emptyProject = Path.join('mode_assets', 'p5', 'empty_project');
     var tempProject = Path.join(os.tmpdir(), 'p5' + Date.now(), 'Untitled');
     wrench.mkdirSyncRecursive(tempProject);
     wrench.copyDirSyncRecursive(emptyProject, tempProject, {
@@ -95,6 +95,10 @@ module.exports = {
         gui.Shell.openExternal(url);
       } else {
         this.outputWindow.reloadIgnoringCache();
+        if(isWin){
+          self.outputWindow.hide();
+          self.outputWindow.show();
+        }
       }
     } else {
       // gui.App.clearCache();

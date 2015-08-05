@@ -16,6 +16,7 @@
   </div>
 
   <div v-component="settings" v-with="settings" v-show="showSettings" id="settingsContainer"></div>
+  <div v-component="credits" v-with="credits" v-show="showCredits" id="creditsContainer" class="creditsContainer"></div>
 
   <input class="file-handler" id="openFile" type="file" />
   <input class="file-handler" id="saveFile" type="file" nwsaveas />
@@ -24,6 +25,9 @@
   <script>
       //save the gui as a global
       var gui = window.require('nw.gui');
+
+      //platform
+      var isWin = /^win/.test(process.platform);
 
       //preserve node keywords
       var nodeRequire = require;

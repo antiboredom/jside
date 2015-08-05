@@ -1,6 +1,6 @@
 {
   "name": "p5",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "main": "index.html",
   "window": {
     "title": "Untitled",
@@ -16,7 +16,7 @@
   "dependencies": {
     "wrench": "~1.5.8",
     "trash": "~0.1.2",
-    "chokidar": "~0.8.2",
+    "chokidar": "1.0.5",
     "node-static": "0.7.6",
     "portscanner": "1.0.0",
     "socket.io": "1.0.6",
