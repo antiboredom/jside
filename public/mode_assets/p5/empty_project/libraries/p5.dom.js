@@ -215,7 +215,7 @@
   p5.prototype.createImg = function() {
     var elt = document.createElement('img');
     var args = arguments;
-    var self;
+    var self = {};
     var setAttrs = function(){
       self.width = elt.width;
       self.height = elt.height;
@@ -1034,6 +1034,7 @@
     this._prevTime = 0;
     this._cueIDCounter = 0;
     this._cues = [];
+    this.pixelDensity = 1;
 
   };
   p5.MediaElement.prototype = Object.create(p5.Element.prototype);
@@ -1173,24 +1174,24 @@
         this.drawingContext = this.canvas.getContext('2d');
       }
       this.drawingContext.drawImage(this.elt, 0, 0, this.width, this.height);
-      p5.prototype.loadPixels.call(this);
+      p5.Renderer2D.prototype.loadPixels.call(this);
     }
     return this;
   }
   p5.MediaElement.prototype.updatePixels =  function(x, y, w, h){
     if (this.loadedmetadata) { // wait for metadata
-      p5.prototype.updatePixels.call(this, x, y, w, h);
+      p5.Renderer2D.prototype.updatePixels.call(this, x, y, w, h);
     }
     return this;
   }
   p5.MediaElement.prototype.get = function(x, y, w, h){
     if (this.loadedmetadata) { // wait for metadata
-      return p5.prototype.get.call(this, x, y, w, h);
+      return p5.Renderer2D.prototype.get.call(this, x, y, w, h);
     } else return [0, 0, 0, 255];
   };
   p5.MediaElement.prototype.set = function(x, y, imgOrCol){
     if (this.loadedmetadata) { // wait for metadata
-      p5.prototype.set.call(this, x, y, imgOrCol);
+      p5.Renderer2D.prototype.set.call(this, x, y, imgOrCol);
     }
   };
 

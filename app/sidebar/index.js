@@ -97,7 +97,9 @@ module.exports = {
       folder.open = !folder.open;
       if (folder.open) {
         File.list(folder.path, function(files) {
-          folder.children = files;
+          var childrenIds = _.map(folder.children, _.property('id'));
+          var newFiles = _.filter(files, function(file) { return !_.contains(childrenIds, file.id); });
+          folder.children = folder.children.concat(newFiles);
           if (!folder.watching) {
             folder.watching = true;
             self.$root.watch(folder.path);
