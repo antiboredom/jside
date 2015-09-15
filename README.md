@@ -55,7 +55,7 @@ Below you'll find documentation for the different libraries we're using
 
 ### Building
 
-Just run the gulp task: 
+Just run the gulp task:
 `gulp build`
 
 This will build Mac and Windows versions of the editor, and place them in `dist/`. Please note that due to an issue with file path lengths (to be fixed, evidently in the next version of npm), Mac users may run into an issue building the Windows version. To fix this install and run `flatten-packages`:

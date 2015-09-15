@@ -48,7 +48,7 @@ var appConfig = {
     tabs: [],
     justSaved: false,
     askReload: false,
-    fileTypes: ['txt', 'html', 'css', 'js', 'json', 'scss', 'xml', 'csv', 'less'],
+    fileTypes: ['txt', 'html', 'css', 'js', 'coffee', 'json', 'scss', 'xml', 'csv', 'less'],
     outX: 50,
     outY: 50
   },
@@ -300,7 +300,7 @@ var appConfig = {
         Files.removeFromTree(path, self.files);
       }).on('change', function(path) {
         if (self.justSaved) {
-          self.justSaved = false; 
+          self.justSaved = false;
         } else {
           if (!self.temp) self.askReload = true;
         }
@@ -378,7 +378,7 @@ var appConfig = {
       });
     },
 
-   
+
 
     saveFile: function() {
       // if this is a new project then trigger a save-as
@@ -443,12 +443,12 @@ var appConfig = {
         }
       }
     },
-    
+
     closeFile: function(path){
         // check to see if there are unsaved files
          var file = Files.find(this.files, path);
         if (!file) return false;
-        
+
 
         if(this.tabs.length==1){
             var win = gui.Window.get();
@@ -461,7 +461,7 @@ var appConfig = {
         }
         if (shouldClose) {
           file.open = false;
-          file.contents = file.lastSavedContents; 
+          file.contents = file.lastSavedContents;
           this.$broadcast('close-file', file);
           return true;
         }
@@ -477,8 +477,9 @@ var appConfig = {
       if (!title) return false;
 
       if (this.fileTypes.indexOf(re.exec(title)[1]) < 0 || (dotSplit.length > 2)){
-        window.alert("unsupported/improper file type selected.\nAutomaticallly adding a .js extension");
-        title = dotSplit[0] + '.js';
+        var altjsExt = '.' + this.settings.altjsType;
+        window.alert("unsupported/improper file type selected.\nAutomaticallly adding a " + altjsExt + " extension");
+        title = dotSplit[0] + altjsExt;
       }
 
       if (typeof basepath === 'undefined') {

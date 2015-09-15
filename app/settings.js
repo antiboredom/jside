@@ -6,7 +6,8 @@ var defaults = {
   consoleOrientation: 'horizontal',
   showSidebar: false,
   wordWrap: false,
-  runInBrowser: false
+  runInBrowser: false,
+  altjsType: "js"
 };
 
 module.exports.load = function() {

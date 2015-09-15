@@ -4,17 +4,41 @@ var os = nodeRequire('os');
 var fs = nodeRequire('fs');
 var request = nodeRequire('request');
 var Files = require('../../files');
-
+var coffee = nodeRequire('coffee-script');
 
 var canvasWidth;
 var canvasHeight;
 var prevCanvasWidth;
 var prevCanvasHeight;
 
+var altjsSettings = {
+  'js': {
+    projectName: 'empty_project',
+    sketchFile: 'sketch.js'
+  },
+  'coffee': {
+    projectName: 'empty_project_coffee',
+    sketchFile: 'sketch.coffee',
+    compile: function( path, cb ) {
+      var options = {
+        bare: true
+      };
+      try {
+        var compiled = coffee.compile(path, options);
+      } catch(err) {
+        cb(err, null);
+        return;
+      }
+      cb(null, compiled);
+    }
+  }
+}
+
 module.exports = {
   newProject: function() {
     //copy the empty project folder to a temporary directory
-    var emptyProject = Path.join('mode_assets', 'p5', 'empty_project');
+    var altjs = altjsSettings[ this.settings.altjsType ];
+    var emptyProject = Path.join('mode_assets', 'p5', altjs.projectName);
     var tempProject = Path.join(os.tmpdir(), 'p5' + Date.now(), 'Untitled');
     wrench.mkdirSyncRecursive(tempProject);
     wrench.copyDirSyncRecursive(emptyProject, tempProject, {
@@ -28,7 +52,7 @@ module.exports = {
     //open the project and file
     var self = this;
     this.loadProject(tempProject, function(){
-      self.openFile(Path.join(tempProject, 'sketch.js'));
+      self.openFile(Path.join(tempProject, altjs.sketchFile));
       gui.Window.get().show();
     });
 
@@ -111,6 +135,28 @@ module.exports = {
     var self = this;
     this.saveAll();
     gui.App.clearCache();
+
+    // compile altJS files
+    if (this.settings.altjsType !== 'js') {
+      var altjs = altjsSettings[this.settings.altjsType];
+      var altjsExt = '.' + this.settings.altjsType;
+      this.files.forEach(function(file) {
+        if (file.ext === altjsExt) {
+          fs.readFile(file.path, 'utf8', function(err, data) {
+            if (!err) {
+              altjs.compile(data, function(err, compiled) {
+                if (!err) {
+                  var newPath = file.path.replace(altjsExt, '.js');
+                  fs.writeFile(newPath, compiled);
+                } else {
+                  alert('Syntax Error: ' + err.message + ' at line ' + err.location['first_line']);
+                }
+              });
+            }
+          });
+        }
+      });
+    }
 
     if (this.outputWindow) {
       if (this.settings.runInBrowser) {
