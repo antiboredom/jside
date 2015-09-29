@@ -4,7 +4,7 @@
   "main": "boot.html",
   "window": {
     "title": "Untitled",
-    "toolbar": false,
+    "toolbar": true,
     "frame": true,
     "position": "center",
     "width": 1024,
@@ -14,13 +14,14 @@
     "resizable": true
   },
   "dependencies": {
-    "wrench": "~1.5.8",
-    "trash": "~0.1.2",
     "chokidar": "1.0.5",
+    "coffee-script": "^1.10.0",
     "node-static": "0.7.6",
     "portscanner": "1.0.0",
+    "rimraf": "^2.3.4",
     "semver": "~3.0.1",
-    "rimraf": "^2.3.4"
+    "trash": "~0.1.2",
+    "wrench": "~1.5.8"
   },
   "devDependencies": {
     "request": "^2.58.0"

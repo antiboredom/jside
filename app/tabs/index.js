@@ -49,10 +49,10 @@ module.exports = {
 					default:
 						newTarget = index - 1;
 						break;
-				}				
+				}
 					tabs.splice(index, 1);
 					this.$root.openFile(tabs[newTarget].path);
-			}			
+			}
 		},
 
 		addTab: function(fileObject, tabs) {

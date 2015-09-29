@@ -64,5 +64,11 @@
       <input type="checkbox" id="runInBrowser" v-model="runInBrowser">
       <label class="highlight fade" for="runInBrowser">Run In Browser</label>
     </div>
+
+    <div id="altjsOptions" class="hiddenRadio">
+      <input type="radio" name="altjsType" value="js" id="altjsTypeJ" v-model="altjsType">
+      <label class="altjsSelection" id="jsBox" for="altjsTypeJ">js</label>
+      <input type="radio" name="altjsType" value="coffee" id="altjsTypeC" v-model="altjsType">
+      <label class="altjsSelection" id="coffeeBox" for="altjsTypeC">coffee</label>
   </div>
 </div>

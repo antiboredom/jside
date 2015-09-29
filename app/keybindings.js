@@ -38,6 +38,10 @@ module.exports.setup = function(app) {
     gui.Window.get().showDevTools();
   });
 
+  Mousetrap.bind(['command+alt+r', 'ctrl+alt+r'], function(e) {
+    gui.Window.get().reload();
+  });
+
   /*Mousetrap.bind(['command+=', 'ctrl+='], function(e) {
     app.changeFontSize(1);
   });

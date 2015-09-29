@@ -9,6 +9,7 @@ var ace = require('brace');
 
 require('brace/mode/html');
 require('brace/mode/javascript');
+require('brace/mode/coffee');
 require('brace/mode/css');
 require('brace/mode/json');
 require('brace/mode/text');
@@ -19,6 +20,7 @@ var modes = {
   ".html": "html",
   ".htm": "html",
   ".js": "javascript",
+  ".coffee": "coffee",
   ".css": "css",
   ".json": "json",
   ".txt": "text"
@@ -107,6 +109,8 @@ module.exports = {
 
       if (ext == '.js') {
         this.ace.setValue(beautify(content, opts), -1);
+      } else if (ext == '.coffee') {
+        this.ace.setValue(beautify_coffee(cotent, opts), -1);
       } else if (ext == '.css') {
         this.ace.setValue(beautify_css(content, opts), -1);
       } else if (ext == '.html') {

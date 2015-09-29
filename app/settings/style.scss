@@ -165,7 +165,7 @@
     input[type="checkbox"] + label {
       background-color: #adacac;
       color: #828384;
-        
+
         &:hover {
         background-color: #cdcccc;
       }
@@ -174,7 +174,7 @@
     input[type="checkbox"]:checked + label {
       background-color: #e1dedc;
       color: #58585b;
-        
+
         &:hover {
         background-color: #fefefc;
       }
@@ -202,15 +202,15 @@
     transition: all 0.3s ease;
   }
 
-  #tabBox {
+  #tabBox, #coffeeBox {
     float: right;
   }
 
-  #spaceBox {
+  #spaceBox, #jsBox {
     float: left;
   }
 
-  #indentOptions {
+  #indentOptions, #altjsOptions {
     position: relative;
     /* margin-bottom: 12px; */
 
@@ -223,7 +223,7 @@
     }
   }
 
-  .indentSelection {
+  .indentSelection, .altjsSelection {
     color: #828384;
     background-color: #adacac;
     display: inline-block;
