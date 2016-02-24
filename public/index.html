@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <title>{{title}} {{currentFile.contents !== currentFile.lastSavedContents ? '*' : ''}}</title>
   <link rel="stylesheet" href="css/main.css">
+
+  <!-- build:remove-dev -->
+  <script src="../node_modules/nw-dev/lib/dev.js"></script>
+  <!-- endbuild -->
+
 </head>
 <body class="{{orientation}}">
   <div v-component="sidebar" v-with="files : files" id="side-container"></div>

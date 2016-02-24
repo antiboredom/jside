@@ -10,6 +10,7 @@ var browserify = require('gulp-browserify');
 var partialify = require('partialify');
 var release = require('github-release');
 var download = require("gulp-download");
+var htmlreplace = require('gulp-html-replace');
 var Path = require('path');
 var fs = require('fs');
 var info = require('./package.json');
@@ -245,7 +246,16 @@ gulp.task('getExamples', function(){
   });
 });
 
-gulp.task('build',  build);
+gulp.task('remove-dev', function () {
+
+  return gulp.src('public/index.html')
+    .pipe(htmlreplace({
+        'remove-dev': ''
+    }))
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('build', build);
 //gulp.task('build', ['nw-build', 'copy-ffmpeg-build']);
 gulp.task('latest', latest);
 gulp.task('default', ['copy-ffmpeg-default', 'css', 'browserify', 'injected-js', 'watch']);
