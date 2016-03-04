@@ -113,7 +113,7 @@ module.exports = {
     gui.App.clearCache();
 
     if (this.outputWindow) {
-      if (this.settings.runInBrowser) {
+      if ((String(self.settings.runInBrowser) == "true")) {
         gui.Shell.openExternal(url);
       } else {
         this.outputWindow.reloadIgnoringCache();
@@ -124,7 +124,7 @@ module.exports = {
       }
     } else {
       startServer(this.projectPath, this, function(url) {
-        if (self.settings.runInBrowser) {
+        if ((String(self.settings.runInBrowser) === "true")) {
           gui.Shell.openExternal(url);
         } else {
           fs.readFile(Path.join(self.projectPath, 'sketch.js'), function(err, data){

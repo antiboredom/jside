@@ -26,9 +26,11 @@ function setup() {
   // (keep it quiet until we're ready to make noise!)
   noise.amp(0);
 
-  // the Env accepts time / value pairs to
-  // create a series of timed fades
-  env = new p5.Env(.01, 1, .2, .1);
+  env = new p5.Env();
+  // set attackTime, decayTime, sustainRatio, releaseTime
+  env.setADSR(0.001, 0.1, 0.2, 0.1);
+  // set attackLevel, releaseLevel
+  env.setRange(1, 0);
 
   // p5.Amplitude will analyze all sound in the sketch
   // unless the setInput() method is used to specify an input.

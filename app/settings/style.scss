@@ -1,31 +1,94 @@
 #settingsContainer {
   position: absolute;
-  background-color: #959595;
-  top: 10px;
-  right: 10px;
+  background-color: #f4f4f4;
+  top: 20px;
+  right: 30px;
   z-index: 999;
-  box-shadow: 0px 0px 6px #999;
+  box-shadow: 0px 12px 12px rgba(0, 0, 0, 0.16);
   color: #fff;
+  width: 276px;
+  padding: 14px 14px 8px 19px;
+}
+
+#settingsPane p {
+  padding: 0;
+  margin: 0;
 }
 
 #settingsPane {
-  // width: 178px;
   width: 100%;
-  font-family: Karla;
-  // -webkit-box-shadow: 0px 8px 17px -2px #58585b;
+  font-family: montserrat;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
 
   #titleBar {
-    background-color: #58585b;
-    padding: 5px 12px 1px;
+    font-family: montserrat-bold;
+    font-size: 21px;
+    color: rgba(51, 51, 51, 0.87);
+    margin-bottom: 19px;
   }
 
   #optionsZone {
-    padding: 0px 12px;
 
     div {
       clear: both;
-      padding-bottom: 14px;
     }
+  }
+
+  .label {
+    color: #333333;
+    font-size: 16px;
+    margin-bottom: 7px;
+  }
+
+  .section {
+    border-bottom: dashed 1px #b5b5b5;
+    margin-bottom: 13.5px;
+    padding-bottom: 13.5px;
+  }
+
+  .section:last-child {
+    border: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  input[type="text"] {
+    width: 44px;
+    height: 40px;
+    border: 1px solid rgba(153, 153, 153, 0.4);
+    color: #333333;
+    background-color: #f4f4f4;
+    font-size: 16px;
+    font-family: inconsolata;
+    text-align: center;
+    margin: 0 22px;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .adjustButtonContainer {
+    width: 43px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .adjustButton {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+
+  .adjustButtonContainer label {
+    font-size: 9px;
+    color: #b5b5b5;
+    margin-top: 8px;
+  }
+
+  input:focus {
+    outline: 0;
   }
 
   .hiddenRadio {
@@ -34,38 +97,12 @@
     input[type="radio"] {
       display:none;
     }
-
-    input[type="radio"]:checked + label svg {
-      fill: #e1dedc;
-
-      &:hover {
-        fill: #fff;
-      }
-    }
-
-    label {
-      display: block;
-    }
-
-    label.left {
-      float: left;
-    }
-
-    label.right {
-      float: right;
-    }
   }
 
   #selectable {
     &:hover {
       fill: #fff;
     }
-  }
-
-  #consoleText {
-    position: relative;
-    top: 5px;
-    margin: 4px 0 6px;
   }
 
   .console {
@@ -81,11 +118,11 @@
   }
 
   #close {
-    width: 19px;
-    height: 19px;
+    width: 24px;
+    height: 24px;
     position: absolute;
-    top: 4px;
-    right: 4px;
+    top: 15px;
+    right: 14px;
   }
 
   #x {
@@ -108,34 +145,6 @@
     position: relative;
   }
 
-  #textAdjust {
-    width: 30px;
-    float: left;
-    position: relative;
-    top: 5px;
-    left: 3px;
-  }
-
-  #textAdjustInput {
-    width: 105px;
-  }
-
-  #indentation {
-    padding-top: 14px;
-  }
-
-  #libs {
-    margin-bottom: 28px;
-    margin-top: 4px;
-  }
-
-  #ww {
-    overflow:auto;
-  }
-
-  #runInBrowserContainer {
-    margin-bottom: 30px;
-  }
 
   #wordWrapIcon {
     width: 23px;
@@ -146,11 +155,10 @@
   }
 
   #browserIcon {
-    width: 23px;
-    float: left;
-    position: relative;
-    top: 8px;
-    left: 5px;
+    width: 44px;
+    height: 44px;
+    margin-right: 20px;
+    cursor: pointer;
   }
 
   .fade {
@@ -202,83 +210,47 @@
     transition: all 0.3s ease;
   }
 
-  #tabBox {
-    float: right;
-  }
 
-  #spaceBox {
-    float: left;
+  #indentationAmount {
+    width: 200px;
+    display: inline;
   }
 
   #indentOptions {
-    position: relative;
-    /* margin-bottom: 12px; */
+    margin-left: 22px;
+  }
 
+  #indentOptions .radioSelection {
+    margin-bottom: 10px;
+    margin-right: 0px;
+    display: block;
+  }
+
+  .radioOptions {
+
+    display: inline-block;
+    color: #b5b5b5;
+    font-size: 12px;
     input[type="radio"]:checked + label {
-      background-color: #e1dedc;
+      color: #333333;
     }
 
     input[type="radio"] + label:hover {
-      background-color: #fff;
+      color: #333333;
     }
+
+    label {
+      cursor: pointer !important;
+    }
+
   }
 
-  .indentSelection {
+  .radioSelection {
     color: #828384;
-    background-color: #adacac;
-    display: inline-block;
     border-radius: 4px;
-    padding: 4px;
-    // float: right;
-    text-align: center;
-    // width: 67px;
-    width: 44%;
-    transition: all 0.3s ease;
+    text-align: left;
+    margin-right: 44px;
+    transition: all 0.15s ease;
   }
 
-  .highlight{
-    background-color: #e1dedc;
-    display: inline-block;
-    border-radius: 4px;
-    padding: 4px;
-    float: right;
-    width: 105px;
-    text-align: center;
-  }
-
-  h2 {
-    font-size: 16px;
-    margin-top: 0;
-    font-weight: normal;
-    -webkit-margin-after: 2px;
-  }
-
-  p {
-    font-size: 13px;
-    color: #58585b;
-  }
-
-  label {
-    color: #58585b;
-    font-size: 13px;
-    position: relative;
-    top: 5px;
-  }
-
-  input[type="text"] {
-    width: 25px;
-    float: right;
-    border-radius: 5px;
-    border: none;
-    background-color: #e1dedc;
-    padding: 4px;
-    outline: none;
-    color: #58585b;
-    font-family: Karla;
-    font-size: 13px;
-  }
-
-  input#tabSize {
-    margin-left: 0.3em;
-  }
 }

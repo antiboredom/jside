@@ -7,6 +7,8 @@
 #side-container {
   flex-direction: column;
   display: flex;
+  font-size: 12px;
+  margin-top: 5px;
 }
 
   #sidebar-container {
@@ -14,7 +16,7 @@
     visibility: hidden;
     position: relative;
     width: 10px;
-    margin-top: 120px;
+    margin-top: 55px;
     flex: 1;
     overflow-y: auto;
   }
@@ -22,9 +24,9 @@
   #sidebar-container.expanded{
     display: flex;
     flex-direction: column;
-    width:160px;
+    width:120px;
     visibility: visible;
-    min-width: 160px;
+    min-width: 120px;
   }
 
 
@@ -82,21 +84,19 @@
 
         div {
           padding: 3px;
-          padding-left: 64px;
-          margin-left:10px;
+          padding-left:30px;
           cursor: pointer;
-          color: $dark-gray;
+          color: #b5b5b5;
           min-width: 60px;
         }
 
         div.selected {
-          background-color: #f6f6f6;
-          border-radius: 5px 0px 0px 5px;
+          background-color: rgba(153, 153, 153, 0.1);
         }
 
         ul li {
           div {
-            padding-left: 85px;
+            padding-left: 46px;
 
           }
 
@@ -117,11 +117,12 @@
 
     .toggle {
       top: 1px;
-      left: 13px;
+      margin-left: -23px;
       position: absolute;
       width: 24px;
-      margin-top: -2px;
+      margin-top: -3px;
       height: 24px;
+      opacity: 0.4;
 
 
       &.open {
@@ -134,13 +135,14 @@
     }
 
     .icon {
-      width: 13px;
-      height: 15px;
+      width: 9px;
+      height: 12px;
       position: absolute;
       top: 4px;
-      margin-left: -20px;
-      background-size: 13px auto;
+      margin-left: -15px;
+      background-size: 9px auto;
       background-repeat: no-repeat;
+      opacity: 0.5;
     }
 
     .icon.file {
@@ -153,11 +155,11 @@
 
     .icon.folder {
       background-image: url('../images/folder.svg');
-      background-size: 17px auto;
+      background-size: 12px auto;
       top: 5px;
       margin-left: -22px;
-      width: 17px;
-      height: 16px;
+      width: 12px;
+      height: 12px;
     }
 
     .icon.image {

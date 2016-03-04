@@ -63,12 +63,16 @@ module.exports = {
             width: this.debugWidth.toString() + "px",
             height: 'auto'
           });
+          $('.prompt-label').css('margin-left', '8px');
+          $('.console-label').css('margin-left', '5px');
 
         } else {
           container.css({
             width: 'auto',
             height: this.debugWidth > $('#editor-container').height() ? "100px" : this.debugWidth.toString() + "px"
           });
+          $('.prompt-label').css('margin-left', '25px');
+          $('.console-label').css('margin-left', '23px');
         }
       }
     },

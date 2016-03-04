@@ -16,7 +16,7 @@ module.exports = {
   computed: {
     className: function() {
       var container = $('#sidebar-container');
-      if (this.$root.settings.showSidebar) {
+      if (String(this.$root.settings.showSidebar) === "true") { // ask sam
         $('#showSidebarLabel').html( $('#showSidebarLabel').data('hide') );
         container.css({
           width: this.sidebarWidth

@@ -2,7 +2,7 @@
  * @name Coordinates
  * @description All shapes drawn to the screen have a position that is 
  * specified as a coordinate. All coordinates are measured as the distance from
- * the origin in units of pixels. The origin [0, 0] is the coordinate is in the
+ * the origin in units of pixels. The origin [0, 0] is the coordinate in the
  * upper left of the window and the coordinate in the lower right is [width-1, 
  * height-1].
  */

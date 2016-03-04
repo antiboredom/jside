@@ -1,7 +1,7 @@
 var defaults = {
   fontSize: 14,
   tabSize: 2,
-  tabType: "spaces",
+  tabType: 'spaces',
   theme: 'tomorrow',
   consoleOrientation: 'horizontal',
   showSidebar: false,

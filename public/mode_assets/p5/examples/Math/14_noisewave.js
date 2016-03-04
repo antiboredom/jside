@@ -17,7 +17,7 @@ function draw() {
   beginShape(); 
   
   var xoff = 0;       // Option #1: 2D Noise
-  // float xoff = yoff; // Option #2: 1D Noise
+  // var xoff = yoff; // Option #2: 1D Noise
   
   // Iterate over horizontal pixels
   for (var x = 0; x <= width; x += 10) {
@@ -27,7 +27,7 @@ function draw() {
     var y = map(noise(xoff, yoff), 0, 1, 200,300);
 
     // Option #2: 1D Noise
-    // float y = map(noise(xoff), 0, 1, 200,300);
+    // var y = map(noise(xoff), 0, 1, 200,300);
     
     // Set the vertex
     vertex(x, y); 

@@ -1,14 +1,3 @@
-  <div id ="button_header">
-   <button id="play" v-class="running: $root.running" v-on="click: $root.toggleRun()"></button>
-  <h1 id="project-name" v-text="projectName"></h1>
-    <div id="toolbar">
-      <div id="actions">
-        <button id="settings" title="Preferences" v-on="click: $root.toggleSettingsPane()">
-          <img src="images/options.svg">
-        </button>
-      </div>
-    </div>
-  </div>
   <div id="tabs"> 
     <ul id="tab-list"> 
       <li v-repeat="tabs | orderBy 'name'" v-component="tab"></li>

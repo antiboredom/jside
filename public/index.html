@@ -6,12 +6,24 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body class="{{orientation}}">
-  <div v-component="sidebar" v-with="files : files" id="side-container"></div>
-  <div id="main-container">
-    <div v-component="tabs" v-ref="tabs" id="header-container"></div>
-    <div id = "editor-container">
-      <div v-component="editor" v-ref="editor" id="main"></div>
-      <div v-component="debug" id="debug-container"></div>
+  <div id="header-container">
+    <img id="logo" src="images/p5-logo.png">
+    <button class="button" id="play" v-class="running: $root.running" v-on="click: $root.toggleRun()"></button>
+    <h1 id="project-name" v-text="projectName"></h1>
+    <div id="toolbar">
+      <div id="actions">
+        <img id="settings" class="button" title="Preferences" src="images/settings-button.svg" v-on="click: $root.toggleSettingsPane()">
+      </div>
+    </div>
+  </div>
+  <div id="flex-container">
+    <div v-component="sidebar" v-with="files : files" id="side-container"></div>
+    <div id="main-container">
+      <div v-component="tabs" v-ref="tabs" id="tab-container"></div>
+      <div id = "editor-container">
+        <div v-component="editor" v-ref="editor" id="main"></div>
+        <div v-component="debug" id="debug-container"></div>
+      </div>
     </div>
   </div>
 

@@ -1,6 +1,5 @@
 <div class="item folder" v-show="!hidden" v-on="click: toggleFolder(this), contextmenu: popupMenu(this, $event)">
   <span class="toggle {{ open ? 'open' : 'closed'}}"></span>
-  <span class="icon {{icon}}"></span>
   {{name}}
 </div>
 <ul v-show="open">
