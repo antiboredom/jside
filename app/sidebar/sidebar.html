@@ -1,10 +1,12 @@
-<div id="sidebar-container" class = "{{className}}"  v-on="contextmenu: popupMenu(this, $event)">
+<div id="sidebar-container" :class="[className]"  @contextmenu="popupMenu(this, $event)">
 	<div id="sidebar">
 		<div id="filetree">
 			<ul>
-				<li v-repeat="files | orderBy 'name'" v-component="{{type}}"></li>
+				<li v-for="file in files | orderBy 'name'">
+					<component :is="file.type" :item="file"></component>
+				</li>
 			</ul>
 		</div>
 	</div>
-	<div id="sidebar-drag" v-on="mousedown: startDrag"></div>
+	<div id="sidebar-drag" @mousedown="startDrag"></div>
 </div>

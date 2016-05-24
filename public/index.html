@@ -5,29 +5,40 @@
   <title>{{title}} {{currentFile.contents !== currentFile.lastSavedContents ? '*' : ''}}</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
-<body class="{{orientation}}">
+<body :class="[orientation]">
   <div id="header-container">
     <img id="logo" src="images/p5-logo.png">
-    <button class="button" id="play" v-class="running: $root.running" v-on="click: $root.toggleRun()"></button>
+    <button class="button" id="play" :class="{'running': running}" @click="$root.toggleRun()"></button>
     <h1 id="project-name" v-text="projectName"></h1>
     <div id="toolbar">
       <div id="actions">
-        <img id="settings" class="button" title="Preferences" src="images/settings-button.svg" v-on="click: $root.toggleSettingsPane()">
+        <img id="settings" class="button" title="Preferences" src="images/settings-button.svg" @click="$root.toggleSettingsPane()">
       </div>
     </div>
   </div>
   <div id="flex-container">
-    <div v-component="sidebar" v-with="files : files" id="side-container"></div>
+    <div id="side-container">
+      <sidebar v-ref:sidebar :files="files"></sidebar>
+    </div>
     <div id="main-container">
-      <div v-component="tabs" v-ref="tabs" id="tab-container"></div>
+      <tabs v-ref:tabs :tabs="tabs" id="tab-container"></tabs>
       <div id = "editor-container">
-        <div v-component="editor" v-ref="editor" id="main"></div>
-        <div v-component="debug" id="debug-container"></div>
+        <editor v-ref:editor id="main"></editor>
+        <debug v-ref:debug id="debug-container"></debug>
       </div>
     </div>
   </div>
 
-  <div v-component="settings" v-with="settings" v-show="showSettings" id="settingsContainer"></div>
+  <div id="settingsContainer" v-show="showSettings">
+    <settings
+    :font-size.sync="settings.fontSize"
+    :tab-size.sync="settings.tabSize"
+    :tab-type.sync="settings.tabType"
+    :word-wrap.sync="settings.wordWrap"
+    :run-in-browser.sync="settings.runInBrowser"
+    :console-orientation.sync="settings.consoleOrientation"
+    :show-sidebar.sync="settings.showSidebar"></settings>
+  </div>
 
   <input class="file-handler" id="openFile" type="file" />
   <input class="file-handler" id="saveFile" type="file" nwsaveas />

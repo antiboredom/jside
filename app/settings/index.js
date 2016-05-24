@@ -1,22 +1,21 @@
 module.exports = {
+  name: 'Settings',
   template: require('./template.html'),
-
-  data: {
-    tabSizeDisplay: 1
-  },
-
-  ready: function() {
-    if (parseInt(this.tabSize) < 1) {
-      this.tabSize = 1;
-    }
-    this.tabSizeDisplay = this.tabSize;
-  },
+  props: [
+    'fontSize',
+    'tabSize',
+    'tabType',
+    'wordWrap',
+    'runInBrowser',
+    'consoleOrientation',
+    'showSidebar'
+  ],
 
   methods: {
     updateTabSize: function(e) {
       var parsed = typeof e === 'number' ? e : parseInt(e.target.value);
       this.tabSize = parsed >= 1 ? parsed : 1;
-      this.tabSizeDisplay = this.tabSize;
+      ace.getSession().setTabSize(this.tabSize);
     },
     decreaseTabSize: function(e) {
       this.updateTabSize(this.tabSize-1);

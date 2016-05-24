@@ -26,22 +26,27 @@ var modes = {
 
 
 module.exports = {
+  name: 'Editor',
   template: require('./template.html'),
 
-  data: {
-    newProject: true
+  data: function() {
+    return {
+      newProject: true
+    };
+  },
+
+  events: {
+    'open-file': 'openFile',
+    'close-file': 'closeFile',
+    'save-project-as': 'saveProjectAs',
+    'reformat': 'reformat',
+    'settings-changed': 'updateSettings'
   },
 
   ready: function() {
     this.sessions = [];
 
-    this.$on('open-file', this.openFile);
-    this.$on('close-file', this.closeFile);
-    this.$on('save-project-as', this.saveProjectAs);
-    this.$on('reformat', this.reformat);
-    this.$on('settings-changed', this.updateSettings);
-
-    this.ace = window.ace = ace.edit('editor');
+    this.ace = window.ace = ace.edit(this.$els.editor);
     //this.ace.setTheme('ace/theme/tomorrow');
     this.ace.setReadOnly(true);
     // this.ace.$worker.send("changeOptions", [{asi: false}]);
@@ -125,7 +130,6 @@ module.exports = {
 
     customizeCommands: function() {
       var self = this;
-
       var commands = [{
         name: "blockoutdent",
         bindKey: {win: 'Ctrl-[,',  mac: 'Command-['},

@@ -7,24 +7,25 @@ var _ = require('underscore');
 var $ = require('jquery');
 
 module.exports = {
+	name: 'Tabs',
 	template: require('./template.html'),
+	props: ['tabs'],
 
 	components: {
 		tab: {
+			name: 'Tab',
 			template: require('./tab.html'),
+			props: ['path', 'name', 'file'],
 			computed: {
 				hidden: function() {
-					return this.name[0] === '.'
+					return this.name[0] === '.';
 				},
-				className: function() {
-					var c = '';
-					if (this.$root.currentFile == this.file) c += 'selected';
-					return c;
+				editing: function() {
+					return this.file.contents !== this.file.lastSavedContents ? '*' : '';
+				},
+				selected: function() {
+					return this.$root.currentFile === this.file;
 				}
-			},
-
-			methods: {
-
 			}
 		}
 	},
@@ -49,10 +50,10 @@ module.exports = {
 					default:
 						newTarget = index - 1;
 						break;
-				}				
+				}
 					tabs.splice(index, 1);
 					this.$root.openFile(tabs[newTarget].path);
-			}			
+			}
 		},
 
 		addTab: function(fileObject, tabs) {
@@ -68,13 +69,12 @@ module.exports = {
 
 				tabs.push(tabObject);
 			}
-		},
+		}
 	},
 
-	ready: function() {
-		this.$on('add-tab', this.addTab);
-		this.$on('close-file', this.closeFile);
+	events: {
+		'add-tab': 'addTab',
+		'close-file': 'closeFile'
+	}
 
-
-	},
 };

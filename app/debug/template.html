@@ -1,2 +1,4 @@
-<div id="debug-drag" v-on="mousedown: startDrag"><span class='prompt-label'>>_</span><span class='console-label'>console</span></div>
-<div id="debug" style="font-size:{{$root.settings.fontSize}}px"></div>
+<div>
+  <div id="debug-drag" @mousedown="startDrag"><span class='prompt-label'>&gt;_</span><span class='console-label'>console</span></div>
+  <div id="debug" :style="{fontSize: $root.settings.fontSize + 'px'}"></div>
+</div>
