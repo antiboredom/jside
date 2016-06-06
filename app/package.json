@@ -1,0 +1,11 @@
+{
+  "name": "electron-boilerplate-vue",
+  "productName": "Electron Boilerplate Vue",
+  "version": "0.1.0",
+  "description": "An Electron + Vue.js project.",
+  "author": "Brad Stewart <me@bradstewart.co>",
+  "main": "background.js",
+  "dependencies": {
+    "jquery": "2.2.2"
+  }
+}

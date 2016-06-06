@@ -1,68 +1,118 @@
-## p5.js Editor: a code editor designed for p5.js
+electron-boilerplate-vue
+==============
+Comprehensive boilerplate application for [Electron runtime](http://electron.atom.io) and [Vue.js](http://vuejs.org). This project is based on [vue-templates/webpack](https://github.com/vuejs-templates/webpack) and the awesome work by @szwacz on [electron-boilerplate](https://github.com/szwacz/electron-boilerplate).
 
-The p5.js Editor is a simple coding environment designed for new programmers to get started with p5.js. It's modeled off of the Processing editor, and intended to provide a similar experience.
+**This README is a work in progress.** This version is a large departure from the previous iteration. If you're looking for the old version, see [this branch](https://github.com/bradstewart/electron-boilerplate-vue/tree/legacy).
 
-![p5.js Editor Screenshot](http://i.imgur.com/fabBKO3.png)
+Scope of this project:
 
-### Features
-* Code editor with syntax highlighting that supports javascript, p5.js syntax, html and css.
-* Creates and manages p5.js project folders
-* Automatically updates new releases of p5.js and add-on libraries
-* Runs sketches inside the editor or in the browser
-* Starts a local server for the user
-* Provides a basic logging console
+- Provide basic structure of the application so you can much easier grasp what should go where.
+- Give you cross-platform development environment, which works the same way on OSX, Windows and Linux.
+- Build scripts for the application using .vue components for production and development with Hot Module Reload.
+- Package scripts to generate executable files (.app, .exe).
+- Test scripts for both unit and end-to-end testing.
+- Generate ready for distribution installers of your app for all supported operating systems.
 
-### Future Plans
-* Linux version
-* Integrated p5.js documentation
-* Update sketches live
+Note: Installer generation is currently NOT implemented. Once electron-builder stablizes, I will add that to the project. 
 
-### Download
-To get started, [download the editor here](https://github.com/processing/p5.js-editor/releases/latest), and visit [p5js.org](http://p5js.org) for more info on p5.js.
 
-## Development
+# Quick start
+The only development dependency of this project is [Node.js](https://nodejs.org). So just make sure you have it installed.
+Then type few commands known to every Node developer...
+```
+git clone https://github.com/bradstewart/electron-boilerplate-vue.git
+cd electron-boilerplate-vue
+npm install
+npm start
+```
+... and boom! You have running desktop application on your screen.
 
-If you're interested in contributing to the development of the editor, check out our issues page, or email [Sam Lavigne](mailto:lavigne@saaaam.com).
+# Structure of the project
 
-When you're ready to get started, follow the direction below:
+There are **two** `package.json` files:  
 
-### Prerequisites
+#### 1. For development
+Sits on path: `electron-boilerplate-vue/package.json`. Here you declare dependencies for your development environment and build scripts. **This file is not distributed with real application!**
 
-1. Node.js
-2. Git
+Also here you declare the version of Electron runtime you want to use:
+```json
+"devDependencies": {
+  "electron-prebuilt": "^0.34.0"
+}
+```
 
-### Setup
+#### 2. For your application
+Sits on path: `electron-boilerplate-vue/app/package.json`. This is **real** manifest of your application. Declare your app dependencies here.
 
-1. Clone this repo: `git clone https://github.com/processing/p5.js-editor`
-2. Enter the repo directory and install the development modules: `npm
-   install`
-3. Install secondary modules: `cd public` and then `npm install`
-4. Install gulp.js globally: `npm install gulp -g`
-5. From the root directory of the repo run gulp: `gulp`
-6. Start up the app: `npm run app`
+#### OMG, but seriously why there are two `package.json`?
+1. Native npm modules (those written in C, not JavaScript) need to be compiled, and here we have two different compilation targets for them. Those used in application need to be compiled against electron runtime, and all `devDependencies` need to be compiled against your locally installed node.js. Thanks to having two files this is trivial.
+2. When you package the app for distribution there is no need to add up to size of the app with your `devDependencies`. Here those are always not included (because reside outside the `app` directory).
 
-### Workflow
+### Project's folders
 
-Most development takes place in the `app` folder. Gulp will watch the files in the app folder, then bundle them up with Browserfiy, and send the results to the `public` folder.
+- `app` - code of your application goes here.
+- `static` - static files which are not processed by webpack.
+- `build` - build scripts, configuration files, and resources.
+- `dist` - webpacked and runnable Electron app.
+- `releases` - ready for distribution installers and executables.
+- `test` - test configuration, runners, and specs.
 
-The public folder contains the `package.json` for the application window, as well as the base `index.html` file for the application.
 
-Below you'll find documentation for the different libraries we're using
-* [vue.js](http://vuejs.org/)
-* [nw.js](https://github.com/nwjs/nw.js/wiki)
-* [browserify](http://browserify.org/)
-* [gulp.js](http://gulpjs.com/)
+# Development
 
-### Building
-
-Just run the gulp task: 
-`gulp build`
-
-This will build Mac and Windows versions of the editor, and place them in `dist/`. Please note that due to an issue with file path lengths (to be fixed, evidently in the next version of npm), Mac users may run into an issue building the Windows version. To fix this install and run `flatten-packages`:
+#### Installation
 
 ```
-npm install -g flatten-packages
-cd public
-flatten-packages
+npm install
 ```
-And then run `gulp build` from the root directory of the project.
+It will also download Electron runtime, and install dependencies for second `package.json` file inside `app` folder.
+
+#### Starting the app
+
+```
+npm start
+```
+
+#### Adding pure-js npm modules to your app
+
+Remember to add your dependency to `app/package.json` file, so do:
+```
+cd app
+npm install name_of_npm_module --save
+```
+
+
+# Making a release
+
+**Note:** There are various icon and bitmap files in the `build/resources` directory. Those are used in installers and are intended to be replaced by your own graphics.
+
+To make ready for distribution installer use command:
+```
+npm run release
+```
+This process uses [electron-packager](https://github.com/electron-userland/electron-packager). See their documentation on packaging for various operating systems. 
+
+
+# License
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Jakub Szwacz, 2016 Brad Stewart
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,8 +1,10 @@
-.org.chromium.*
-*.sublime-*
-node_modules/
-dist/
-cache/
-public/js/main.js
-public/css
 .DS_Store
+Thumbs.db
+node_modules/
+app/dist/
+dist/
+releases/
+npm-debug.log*
+selenium-debug.log
+test/unit/coverage
+test/e2e/reports
