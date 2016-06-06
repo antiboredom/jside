@@ -11,6 +11,10 @@ var BLUE = '\x1b[34m'
 var END = '\x1b[0m'
 
 function format (command, data, color) {
+  // data seems to be a buffer and not a string
+  if (typeof data !== 'string') {
+    data = data.toString();
+  }
   return color + command + END +
     '  ' + // Two space offset
     data.trim().replace(/\n/g, '\n' + repeat(' ', command.length + 2)) +
