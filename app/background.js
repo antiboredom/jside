@@ -4,21 +4,41 @@
 // window from here.
 
 import { app, BrowserWindow } from 'electron'
-import path from 'path'
+import Path from 'path'
+import fs from 'fs'
+
+var winSettings = {
+  x: 50,
+  y: 50,
+  width: 1024,
+  height: 768,
+  show: false
+}
+
+/* localStorage.openWindows = 0
+
+var windows = localStorage.windows ? JSON.parse(localStorage.windows) : []
+localStorage.windows = JSON.stringify([])
+
+var windowsToOpen = windows.filter(function(w){
+  return w.path && fs.existsSync(w.path)
+}) */
 
 let mainWindow
 
-app.on('ready', () => {
-  mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 768
-  })
+function openProject (path) {
+  if (typeof path === 'string' && fs.lstatSync(path).isDirectory()) {
+    var sketchPath = Path.join(path, 'sketch.js')
+    if (fs.existsSync(sketchPath)) path = sketchPath
+  }
+
+  mainWindow = new BrowserWindow(winSettings)
 
   // Load the HTML file directly from the webpack dev server if
   // hot reload is enabled, otherwise load the local file.
   const mainURL = process.env.HOT
     ? `http://localhost:${process.env.PORT}/main.html`
-    : 'file://' + path.join(__dirname, 'main.html')
+    : 'file://' + Path.join(__dirname, 'main.html')
 
   mainWindow.loadURL(mainURL)
 
@@ -29,6 +49,10 @@ app.on('ready', () => {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+}
+
+app.on('ready', () => {
+  openProject()
 })
 
 app.on('window-all-closed', () => {
