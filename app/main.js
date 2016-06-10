@@ -537,6 +537,7 @@ new Vue({
         this.modeFunction('stop')
       } else {
         // $('#debug').html('')
+        console.log('toggle run calling modeFunction run!')
         this.modeFunction('run')
       }
     },

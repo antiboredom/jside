@@ -29,6 +29,8 @@ module.exports = {
       forceDelete: true
     })
 
+    console.log('this in p5-mode newProject is')
+    console.log(this)
     this.projectPath = tempProject
 
     // open the project and file
@@ -113,21 +115,21 @@ module.exports = {
 
   run: function () {
     var self = this
-    this.saveAll()
+    self.saveAll()
     // gui.App.clearCache()
     remote.getCurrentWindow().webContents.session.clearCache(function () {
-      if (this.outputWindow) {
+      if (self.outputWindow) {
         if ((String(self.settings.runInBrowser) === 'true')) {
           shell.openExternal(url)
         } else {
-          this.outputWindow.reloadIgnoringCache()
+          self.outputWindow.reloadIgnoringCache()
           if (isWin | isLinux) {
             self.outputWindow.hide()
             self.outputWindow.show()
           }
         }
       } else {
-        startServer(this.projectPath, this, function (url) {
+        startServer(self.projectPath, self, function (url) {
           if ((String(self.settings.runInBrowser) === 'true')) {
             shell.openExternal(url)
           } else {
@@ -155,7 +157,7 @@ module.exports = {
               prevCanvasWidth = canvasWidth
               prevCanvasHeight = canvasHeight
 
-              self.outputWindow.webContents.on('document-start', function () {
+              self.outputWindow.webContents.on('did-finish-load', function () {
                 self.outputWindow.show()
               })
 
@@ -268,6 +270,7 @@ var file
 // var p5serial = require('p5.serialserver')
 
 function startServer (path, app, callback) {
+  console.log(`root path for static server: ${path}`)
   if (running === false) {
     // if (!nodeGlobal.serialRunning) {
     //   p5serial.start()
@@ -287,6 +290,8 @@ function startServer (path, app, callback) {
 
       function handler (request, response) {
         request.addListener('end', function () {
+          console.log('request to static server:')
+          console.log(request)
           file.serve(request, response)
         }).resume()
       }
