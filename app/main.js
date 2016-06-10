@@ -197,7 +197,7 @@ new Vue({
             // windowstate.decrementWindows()
 
             win.webContents.on('did-finish-load', function () {
-              win.webContents.executeJavaScript(`window.PATH = ${self.currentFile.path}`)
+              win.webContents.executeJavaScript(`window.PATH = '${self.currentFile.path}'`)
               remote.getCurrentWindow().close()
             })
           }
@@ -239,10 +239,9 @@ new Vue({
       win.openDevTools()
 
       win.on('closed', () => {
-        // remote.getGlobal('sharedObj').windows.pop(remote.getGlobal('sharedObj').windows.indexOf(win))
-        win = null
+        remote.getGlobal('sharedObj').windows.pop(remote.getGlobal('sharedObj').windows.indexOf(this))
       })
-      // remote.getGlobal('sharedObj').windows.push(win)
+      remote.getGlobal('sharedObj').windows.push(win)
       return win
     },
 
@@ -265,7 +264,7 @@ new Vue({
           if (fs.existsSync(sketchPath)) path = sketchPath
         }
         // win.window.PATH = path
-        win.webContents.executeJavaScript(`window.PATH = ${path}`)
+        win.webContents.executeJavaScript(`window.PATH = '${path}'`)
         if (typeof temp === 'boolean' && temp === true) {
           // win.window.UNSAVED = true
           win.webContents.executeJavaScript('window.UNSAVED = true')

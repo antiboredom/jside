@@ -43,7 +43,7 @@ module.exports = {
 
   launchExample: function (examplePath) {
     // copy the empty project folder to a temporary directory
-    var emptyProject = 'mode_assets/p5/empty_project'
+    var emptyProject = 'static/mode_assets/p5/empty_project'
     var tempProjectPath = Path.join(os.tmpdir(), 'p5' + Date.now(), Files.cleanExampleName(examplePath))
     wrench.mkdirSyncRecursive(tempProjectPath)
     wrench.copyDirSyncRecursive(emptyProject, tempProjectPath, {
@@ -59,7 +59,7 @@ module.exports = {
       wrench.mkdirSyncRecursive(assetsDir)
       assets.forEach(function (a) {
         a = a.replace(/(assets\/)|['"]/g, '')
-        var originalAsset = Path.join('mode_assets/p5/example_assets', a)
+        var originalAsset = Path.join('static/mode_assets/p5/example_assets', a)
         var destAsset = Path.join(assetsDir, a)
         fs.createReadStream(originalAsset).pipe(fs.createWriteStream(destAsset))
       })
@@ -202,7 +202,7 @@ module.exports = {
 
   update: function (callback) {
     var url = 'https://api.github.com/repos/processing/p5.js/releases/latest'
-    var libraryPath = Path.join('mode_assets', 'p5', 'empty_project', 'libraries')
+    var libraryPath = Path.join('static', 'mode_assets', 'p5', 'empty_project', 'libraries')
     var fileNames = ['p5.js', 'p5.dom.js', 'p5.sound.js']
 
     request({url: url, headers: {'User-Agent': 'request'}}, function (error, response, data) {
@@ -240,7 +240,7 @@ module.exports = {
 
   addLibrary: function (path) {
     var basename = Path.basename(path)
-    var src = Path.join('mode_assets', 'p5', 'libraries', basename)
+    var src = Path.join('static', 'mode_assets', 'p5', 'libraries', basename)
     var dest = Path.join(this.projectPath, 'libraries', basename)
     fs.createReadStream(src).pipe(fs.createWriteStream(dest))
 
