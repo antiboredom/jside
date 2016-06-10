@@ -9,7 +9,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import keybindings from './keybindings'
 import Files from './files'
-// import menu from './menu'
+import menu from './menu'
 // import windowstate from './windowstate'
 // import updater from './updater'
 import settings from './settings'
@@ -73,7 +73,7 @@ new Vue({
   ready: function () {
     // updater.check()
     keybindings.setup(this)
-    // menu.setup(this)
+    menu.setup(this)
 
     this.setupFileListener()
     this.setupCloseHandler()
