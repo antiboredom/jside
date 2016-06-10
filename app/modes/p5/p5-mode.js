@@ -147,20 +147,16 @@ module.exports = {
               }
 
               self.outputWindow = self.newWindow(url, {
-                toolbar: true,
-                'inject-js-start': 'js/debug-console.js',
                 x: self.outX,
                 y: self.outY,
                 width: self.outW,
-                height: self.outH,
-                nodejs: false,
-                'page-cache': false,
+                height: self.outH
               })
 
               prevCanvasWidth = canvasWidth
               prevCanvasHeight = canvasHeight
 
-              self.outputWindow.on('document-start', function(){
+              self.outputWindow.webContents.on('document-start', function(){
                 self.outputWindow.show()
               })
 
@@ -174,7 +170,6 @@ module.exports = {
                 self.outH = self.outputWindow.height - 55
                 self.running = false
                 self.outputWindow = null
-                this.close(true)
               })
 
               self.outputWindow.on('focus', function(){

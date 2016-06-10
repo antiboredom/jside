@@ -19,27 +19,24 @@ let modes = {
 
 const shell = require('electron').shell
 const remote = require('electron').remote
-const BrowserWindow = require('electron').BrowserWindow
+const BrowserWindow = require('electron').remote.BrowserWindow
 
 require('./Window')
-const Editor = require('./components/Editor')
-const Sidebar = require('./components/Sidebar')
-const Settings = require('./components/Settings')
-const Tabs = require('./components/Tabs')
 
 // import App from './App'
 
 /* eslint-disable no-new */
-remote.getGlobal('sharedObj').vueApp = new Vue({
+new Vue({
   el: '#app',
-  components: {
-    editor: Editor,
-    sidebar: Sidebar,
-    settings: Settings,
-    tabs: Tabs
-  },
 
   mode: modes.p5,
+
+  components: {
+    editor: require('./components/Editor'),
+    sidebar: require('./components/Sidebar'),
+    settings: require('./components/Settings'),
+    tabs: require('./components/Tabs')
+  },
 
   data: {
     title: 'Untitled',
@@ -63,7 +60,8 @@ remote.getGlobal('sharedObj').vueApp = new Vue({
 
   computed: {
     projectName: function () {
-      return Path.basename(this.projectPath)
+      console.log(`projectpath var is = ${this.projectPath}`)
+      return (typeof this.projectPath != "undefined") ? Path.basename(this.projectPath) : ''
     },
 
     orientation: function () {
@@ -235,14 +233,17 @@ remote.getGlobal('sharedObj').vueApp = new Vue({
         y: currentWindow.y + 50,
         width: 1024,
         height: 768,
-        show: false
+        show: true
       }, options))
       win.loadURL(url)
+
+      win.openDevTools()
+
       win.on('closed', () => {
-      	remote.getGlobal('sharedObj').windows.pop(remote.getGlobal('sharedObj').windows.indexOf(win))
+      	// remote.getGlobal('sharedObj').windows.pop(remote.getGlobal('sharedObj').windows.indexOf(win))
         win = null
       })
-      remote.getGlobal('sharedObj').windows.push(win)
+      // remote.getGlobal('sharedObj').windows.push(win)
       return win
     },
 

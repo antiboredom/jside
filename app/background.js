@@ -42,11 +42,11 @@ function createWindow () {
   }
 
   win.on('closed', () => {
-    global.sharedObj.windows.pop(global.sharedObj.windows.indexOf(win))
+    // global.sharedObj.windows.pop(global.sharedObj.windows.indexOf(win))
     win = null
   })
 
-  global.sharedObj.windows.push(win)
+  // global.sharedObj.windows.push(win)
 
   win.show()
 }
