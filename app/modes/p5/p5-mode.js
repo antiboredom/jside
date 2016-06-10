@@ -18,8 +18,8 @@ var prevCanvasWidth
 var prevCanvasHeight
 
 module.exports = {
-  newProject: function() {
-    //copy the empty project folder to a temporary directory
+  newProject: function () {
+    // copy the empty project folder to a temporary directory
     var emptyProject = Path.join('static', 'mode_assets', 'p5', 'empty_project')
     var tempProject = Path.join(os.tmpdir(), 'p5' + Date.now(), 'Untitled')
     wrench.mkdirSyncRecursive(tempProject)
@@ -31,18 +31,16 @@ module.exports = {
 
     this.projectPath = tempProject
 
-    //open the project and file
+    // open the project and file
     var self = this
-    this.loadProject(tempProject, function(){
+    this.loadProject(tempProject, function () {
       self.openFile(Path.join(tempProject, 'sketch.js'))
       remote.getCurrentWindow().show()
     })
-
   },
 
-
-  launchExample: function(examplePath) {
-    //copy the empty project folder to a temporary directory
+  launchExample: function (examplePath) {
+    // copy the empty project folder to a temporary directory
     var emptyProject = 'mode_assets/p5/empty_project'
     var tempProjectPath = Path.join(os.tmpdir(), 'p5' + Date.now(), Files.cleanExampleName(examplePath))
     wrench.mkdirSyncRecursive(tempProjectPath)
@@ -57,40 +55,40 @@ module.exports = {
     if (assets) {
       var assetsDir = Path.join(tempProjectPath, 'assets')
       wrench.mkdirSyncRecursive(assetsDir)
-      assets.forEach(function(a){
+      assets.forEach(function (a) {
         a = a.replace(/(assets\/)|['"]/g, '')
         var originalAsset = Path.join('mode_assets/p5/example_assets', a)
         var destAsset = Path.join(assetsDir, a)
         fs.createReadStream(originalAsset).pipe(fs.createWriteStream(destAsset))
       })
     }
-    var destination = Path.join(tempProjectPath, "sketch.js")
+    var destination = Path.join(tempProjectPath, 'sketch.js')
     fs.writeFileSync(destination, sketchContents)
     this.openProject(tempProjectPath, true)
   },
 
-  exportProject: function() {
+  exportProject: function () {
     console.log('hello')
   },
 
-  saveAs: function(path) {
+  saveAs: function (path) {
     if (!path) return false
 
     if (path.indexOf(this.projectPath) > -1) {
-      alert("Unable to save project inside another project")
+      alert('Unable to save project inside another project')
       return false
     }
-    //save all files
+    // save all files
     this.saveAll()
 
-    //copy the folder
+    // copy the folder
     wrench.copyDirSyncRecursive(this.projectPath, path)
 
-    //change file paths
-    this.files.forEach(function(file) {
+    // change file paths
+    this.files.forEach(function (file) {
       file.path = Path.join(path, file.name)
     })
-    this.tabs.forEach(function(tab){
+    this.tabs.forEach(function (tab) {
       tab.path = Path.join(path, tab.name)
     })
 
@@ -101,7 +99,7 @@ module.exports = {
     var projectTitle = Path.basename(path)
     var oldProjectTitle = Path.basename(this.projectPath)
 
-    fs.readFile(indexPath, 'utf8', function(err, data){
+    fs.readFile(indexPath, 'utf8', function (err, data) {
       if (!err) {
         data = data.replace('<title>' + oldProjectTitle + '</title>', '<title>' + projectTitle + '</title>')
         fs.writeFile(indexPath, data)
@@ -113,35 +111,36 @@ module.exports = {
     this.watch(path)
   },
 
-  run: function() {
+  run: function () {
     var self = this
     this.saveAll()
     // gui.App.clearCache()
-    remote.getCurrentWindow().webContents.session.clearCache(function() {
+    remote.getCurrentWindow().webContents.session.clearCache(function () {
       if (this.outputWindow) {
-        if ((String(self.settings.runInBrowser) == "true")) {
+        if ((String(self.settings.runInBrowser) === 'true')) {
           shell.openExternal(url)
         } else {
           this.outputWindow.reloadIgnoringCache()
-          if(isWin | isLinux){
+          if (isWin | isLinux) {
             self.outputWindow.hide()
             self.outputWindow.show()
           }
         }
       } else {
-        startServer(this.projectPath, this, function(url) {
-          if ((String(self.settings.runInBrowser) === "true")) {
+        startServer(this.projectPath, this, function (url) {
+          if ((String(self.settings.runInBrowser) === 'true')) {
             shell.openExternal(url)
           } else {
-            fs.readFile(Path.join(self.projectPath, 'sketch.js'), function(err, data){
-              var matches = (""+data).match(/createCanvas\((.*),(.*)\)/)
+            fs.readFile(Path.join(self.projectPath, 'sketch.js'), function (err, data) {
+              if (err) throw err
+              var matches = ('' + data).match(/createCanvas\((.*),(.*)\)/)
               canvasWidth = matches && matches[1] ? +matches[1] : 400
               canvasHeight = matches && matches[2] ? +matches[2] : 400
 
               if (!self.outW) self.outW = canvasWidth
               if (!self.outH) self.outH = canvasHeight
 
-              if ((canvasWidth != prevCanvasWidth || canvasHeight != prevCanvasHeight) && !self.resizedOutputWindow) {
+              if ((canvasWidth !== prevCanvasWidth || canvasHeight !== prevCanvasHeight) && !self.resizedOutputWindow) {
                 self.outW = canvasWidth
                 self.outH = canvasHeight
               }
@@ -156,11 +155,11 @@ module.exports = {
               prevCanvasWidth = canvasWidth
               prevCanvasHeight = canvasHeight
 
-              self.outputWindow.webContents.on('document-start', function(){
+              self.outputWindow.webContents.on('document-start', function () {
                 self.outputWindow.show()
               })
 
-              self.outputWindow.on("close", function(){
+              self.outputWindow.on('close', function () {
                 self.outX = self.outputWindow.x
                 self.outY = self.outputWindow.y
                 self.outW = self.outputWindow.width
@@ -172,11 +171,11 @@ module.exports = {
                 self.outputWindow = null
               })
 
-              self.outputWindow.on('focus', function(){
+              self.outputWindow.on('focus', function () {
                 self.resetMenu()
               })
 
-              self.outputWindow.on('resize', function() {
+              self.outputWindow.on('resize', function () {
                 self.resizedOutputWindow = true
               })
             })
@@ -185,10 +184,9 @@ module.exports = {
         })
       }
     })
-
   },
 
-  stop: function() {
+  stop: function () {
     // if (nodeGlobal.serialRunning) {
     //   p5serial.stop()
     //   nodeGlobal.serialRunning = false
@@ -200,16 +198,16 @@ module.exports = {
     }
   },
 
-  update: function(callback) {
+  update: function (callback) {
     var url = 'https://api.github.com/repos/processing/p5.js/releases/latest'
     var libraryPath = Path.join('mode_assets', 'p5', 'empty_project', 'libraries')
     var fileNames = ['p5.js', 'p5.dom.js', 'p5.sound.js']
 
-    request({url: url, headers: {'User-Agent': 'request'}}, function(error, response, data){
+    request({url: url, headers: {'User-Agent': 'request'}}, function (error, response, data) {
       if (error) return
 
       // filter assets to only include the filenames we want
-      var assets = JSON.parse(data).assets.filter(function(asset){
+      var assets = JSON.parse(data).assets.filter(function (asset) {
         return fileNames.indexOf(asset.name) > -1
       })
 
@@ -217,19 +215,18 @@ module.exports = {
       var remoteVersion = JSON.parse(data).tag_name
       var localPathToP5 = Path.join(libraryPath, 'p5.js')
 
-      var localVersionTag = getVersion(localPathToP5, function(localVersion) {
-        if (remoteVersion != localVersion || !localVersion) {
-          assets.forEach(function(asset) {
+      var localVersionTag = getVersion(localPathToP5, function (localVersion) {
+        if (remoteVersion !== localVersion || !localVersion) {
+          assets.forEach(function (asset) {
             var localPathToAsset = Path.join(libraryPath, asset.name)
             downloadAsset(asset.browser_download_url, localPathToAsset)
           })
         }
       })
-
     })
 
-    function downloadAsset(remote, local) {
-      request({url: remote, headers: {'User-Agent': 'request'}}, function(error, response, body){
+    function downloadAsset (remote, local) {
+      request({url: remote, headers: {'User-Agent': 'request'}}, function (error, response, body) {
         if (error) return
 
         if (body.split('\n')[0].indexOf('/*! p5.') > -1) {
@@ -239,15 +236,16 @@ module.exports = {
     }
   },
 
-  addLibrary: function(path) {
+  addLibrary: function (path) {
     var basename = Path.basename(path)
     var src = Path.join('mode_assets', 'p5', 'libraries', basename)
     var dest = Path.join(this.projectPath, 'libraries', basename)
     fs.createReadStream(src).pipe(fs.createWriteStream(dest))
 
     var indexPath = Path.join(this.projectPath, 'index.html')
-    fs.readFile(indexPath, 'utf8', function(err, data){
-      var scriptTag = '<script src="libraries/'+basename+'" type="text/javascript"></script>'
+    fs.readFile(indexPath, 'utf8', function (err, data) {
+      if (err) throw err
+      var scriptTag = '<script src="libraries/' + basename + '" type="text/javascript"></script>'
       var p5tag = '<script src="libraries/p5.js" type="text/javascript"></script>'
 
       if (data.indexOf(scriptTag) < 0) {
@@ -263,55 +261,53 @@ module.exports = {
 
 var running = false
 var url = ''
-var staticServer = require('node-static'), server, file
+var staticServer = require('node-static')
+var server
+var file
 
 // var p5serial = require('p5.serialserver')
 
-function startServer(path, app, callback) {
+function startServer (path, app, callback) {
   if (running === false) {
     // if (!nodeGlobal.serialRunning) {
     //   p5serial.start()
     //   nodeGlobal.serialRunning = true
     // }
     var portscanner = require('portscanner')
-    portscanner.findAPortNotInUse(3000, 4000, '127.0.0.1', function(error, port) {
+    portscanner.findAPortNotInUse(3000, 4000, '127.0.0.1', function (err, port) {
+      if (err) throw err
       server = require('http').createServer(handler)
       file = new staticServer.Server(path, {cache: false})
 
-      server.listen(port, function(){
+      server.listen(port, function () {
         url = 'http://localhost:' + port
         callback(url)
         running = true
       })
 
-      function handler(request, response) {
+      function handler (request, response) {
         request.addListener('end', function () {
           file.serve(request, response)
         }).resume()
       }
     })
-
-
   } else {
     file = new staticServer.Server(path, {cache: false})
     callback(url)
   }
-
 }
 
-function getVersion(filename, callback) {
+function getVersion (filename, callback) {
   fs.readFile(filename, function (err, data) {
     if (err) throw err
 
-    var line = data.toString('utf-8').split("\n")[0]
+    var line = data.toString('utf-8').split('\n')[0]
     var version
     try {
       version = line.match(/v\d+\.\d+\.\d+/)[0].substring(1)
-    } catch(e) {
+    } catch (e) {
       version = null
     }
     callback(version)
-
   })
-
 }

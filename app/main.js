@@ -61,7 +61,7 @@ new Vue({
   computed: {
     projectName: function () {
       console.log(`projectpath var is = ${this.projectPath}`)
-      return (typeof this.projectPath != "undefined") ? Path.basename(this.projectPath) : ''
+      return (typeof this.projectPath != 'undefined') ? Path.basename(this.projectPath) : ''
     },
 
     orientation: function () {
@@ -100,7 +100,7 @@ new Vue({
       let self = this
       this.loadProject(this.projectPath, function () {
         if (filename) {
-           if (Path.dirname(filename) === self.projectPath) {
+          if (Path.dirname(filename) === self.projectPath) {
             self.openFile(filename)
           } else {
             self.$broadcast('open-nested-file', filename)
@@ -116,16 +116,16 @@ new Vue({
       // menu.updateRecentFiles(this)
     }
     let win = remote.getCurrentWindow()
-    win.setMinimumSize(400,400)
-    if(($(window).width() + 100 >= screen.width) || ($(window).height() + 100 >= screen.height)){
+    win.setMinimumSize(400, 400)
+    if (($(window).width() + 100 >= screen.width) || ($(window).height() + 100 >= screen.height)) {
       console.log(`screen width=${screen.width}. screen height=${screen.height}`)
-      console.log(`setsize width=${(screen.width * 4)/5}. set size height=${(screen.height * 7)/8}`)
-      win.setSize(Math.floor((screen.width * 4)/5), Math.floor((screen.height * 7)/8))
+      console.log(`setsize width=${(screen.width * 4) / 5}. set size height=${(screen.height * 7) / 8}`)
+      win.setSize(Math.floor((screen.width * 4) / 5), Math.floor((screen.height * 7) / 8))
     }
   },
 
   methods: {
-    //runs a function named func in the mode file currently being used
+    // runs a function named func in the mode file currently being used
     modeFunction: function (func, args) {
       let mode = this.$options.mode
       if (typeof mode[func] === 'function') {
@@ -140,7 +140,7 @@ new Vue({
 
     setupSettings: function () {
       this.settings = settings.load()
-      this.$watch('settings', function (value){
+      this.$watch('settings', function (value) {
         this.$broadcast('settings-changed', value)
         settings.save(value)
       })
@@ -158,10 +158,10 @@ new Vue({
     setupCloseHandler: function () {
       let self = this
       let win = remote.getCurrentWindow()
-      win.on('close', function (closeEvent){
+      win.on('close', function (closeEvent) {
         // check to see if there are unsaved files
         let shouldClose = true
-        if (_.any(self.files, function (f) { return f.contents != f.lastSavedContents; })) {
+        if (_.any(self.files, function (f) { return f.contents !== f.lastSavedContents })) {
           shouldClose = confirm('You have unsaved files. Quit and lose changes?')
         }
         if (shouldClose) {
@@ -186,18 +186,17 @@ new Vue({
         }
       })
 
-      win.on('focus', function (){
+      win.on('focus', function () {
         self.focused = true
         self.resetMenu()
         if (self.askReload) {
           self.askReload = false
           let shouldRefresh = confirm(self.currentFile.path + ' was edited on the disk. Reload? You will lose any changes.')
           if (shouldRefresh) {
-
             let win = self.newWindow(self.windowURL)
             // windowstate.decrementWindows()
 
-            win.webContents.on('did-finish-load', function (){
+            win.webContents.on('did-finish-load', function () {
               win.webContents.executeJavaScript(`window.PATH = ${self.currentFile.path}`)
               remote.getCurrentWindow().close()
             })
@@ -205,7 +204,7 @@ new Vue({
         }
       })
 
-      win.on('blur', function (){
+      win.on('blur', function () {
         self.focused = false
       })
     },
@@ -240,7 +239,7 @@ new Vue({
       win.openDevTools()
 
       win.on('closed', () => {
-      	// remote.getGlobal('sharedObj').windows.pop(remote.getGlobal('sharedObj').windows.indexOf(win))
+        // remote.getGlobal('sharedObj').windows.pop(remote.getGlobal('sharedObj').windows.indexOf(win))
         win = null
       })
       // remote.getGlobal('sharedObj').windows.push(win)
@@ -269,7 +268,7 @@ new Vue({
         win.webContents.executeJavaScript(`window.PATH = ${path}`)
         if (typeof temp === 'boolean' && temp === true) {
           // win.window.UNSAVED = true
-          win.webContents.executeJavaScript(`window.UNSAVED = true`)
+          win.webContents.executeJavaScript('window.UNSAVED = true')
         }
       })
       return win
@@ -297,7 +296,7 @@ new Vue({
       let watcher = chokidar.watch(path, {
         ignoreInitial: true,
         ignored: function (filepath) {
-          let regex = new RegExp(path + '\/.*\/.+')
+          let regex = new RegExp(path + '/.*/.+')
           return regex.test(filepath)
         }
       })
@@ -341,7 +340,7 @@ new Vue({
     // save all open files
     saveAll: function () {
       _.where(this.files, {type: 'file', open: true}).forEach(function (file) {
-        if (file.lastSavedContents != file.contents) {
+        if (file.lastSavedContents !== file.contents) {
           fs.writeFileSync(file.path, file.contents, 'utf8')
           file.lastSavedContents = file.contents
         }
@@ -410,7 +409,7 @@ new Vue({
       let filename = Path.join(Path.dirname(path), newName)
       fs.writeFile(filename, this.currentFile.contents, 'utf8', function (err) {
         if (err) throw err
-        let f = Files.setup(filename)
+        Files.setup(filename)
         self.openFile(filename)
       })
     },
@@ -420,9 +419,8 @@ new Vue({
 
       self.justSaved = true
 
-      fs.writeFileSync(this.currentFile.path, this.currentFile.contents, "utf8")
+      fs.writeFileSync(this.currentFile.path, this.currentFile.contents, 'utf8')
       this.currentFile.lastSavedContents = this.currentFile.contents
-
     },
 
     // open up a file - read its contents if it's not already opened
@@ -434,7 +432,7 @@ new Vue({
       let file = Files.find(this.files, path)
       if (!file) return false
       if (self.fileTypes.indexOf(ext) < 0) {
-        window.alert("Unsupported file type. Types we can edit:\n" + self.fileTypes.toString())
+        window.alert('Unsupported file type. Types we can edit:\n' + self.fileTypes.toString())
       } else {
         if (file.open) {
           this.title = file.name
@@ -461,13 +459,13 @@ new Vue({
       let file = Files.find(this.files, path)
       if (!file) return false
 
-      if(this.tabs.length==1){
-          let win = remote.getCurrentWindow
-          win.close()
-      }
+      // if (this.tabs.length === 1) {
+      //   let win = remote.getCurrentWindow()
+      //   win.close()
+      // }
       let shouldClose = true
-      let win = remote.getCurrentWindow()
-      if (file.contents != file.lastSavedContents){
+      // let win = remote.getCurrentWindow()
+      if (file.contents !== file.lastSavedContents) {
         shouldClose = confirm('You have unsaved changes. Close file and lose changes?')
       }
       if (shouldClose) {
@@ -481,14 +479,14 @@ new Vue({
 
     // create a new file and save it in the project path
     newFile: function (basepath) {
-      let title = prompt('Choose a file name and type: \nSupported types: ' + this.fileTypes.toString()).replace(/ /g,'')
-      let dotSplit = title.split(".")
+      let title = prompt('Choose a file name and type: \nSupported types: ' + this.fileTypes.toString()).replace(/ /g, '')
+      let dotSplit = title.split('.')
       let re = /(?:\.([^.]+))?$/
 
       if (!title) return false
 
       if (this.fileTypes.indexOf(re.exec(title)[1]) < 0 || (dotSplit.length > 2)){
-        window.alert("unsupported/improper file type selected.\nAutomaticallly adding a .js extension")
+        window.alert('unsupported/improper file type selected.\nAutomaticallly adding a .js extension')
         title = dotSplit[0] + '.js'
       }
 
@@ -499,8 +497,8 @@ new Vue({
       let filename = Path.join(basepath, title)
 
       let self = this
-      fs.writeFile(filename, '', 'utf8', function (err){
-      	if (err) throw err
+      fs.writeFile(filename, '', 'utf8', function (err) {
+        if (err) throw err
         let f = Files.setup(filename)
         Files.addToTree(f, self.files, self.projectPath)
         self.openFile(filename)
@@ -517,7 +515,7 @@ new Vue({
 
       let filename = Path.join(basepath, title)
 
-      let self = this
+      // let self = this
       fs.mkdir(filename)
     },
 
@@ -528,7 +526,6 @@ new Vue({
 
       fs.rename(path, Path.join(Path.dirname(path), newName))
     },
-
 
     run: function () {
       // $('#debug').html('')
@@ -558,11 +555,11 @@ new Vue({
 
     showHelp: function () {
       // gui.Shell.openExternal(this.$options.mode.referenceURL)
-      shell.openExternal(this.$options.mode.referenceURL);
+      shell.openExternal(this.$options.mode.referenceURL)
     }
 
   }
 })
 
-console.log("this is the vue app")
+console.log('this is the vue app')
 console.log(remote.getGlobal('sharedObj').vueApp)
