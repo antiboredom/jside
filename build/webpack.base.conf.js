@@ -30,19 +30,9 @@ module.exports = {
     fallback: [path.join(__dirname, '../node_modules')]
   },
   module: {
+    noParse: /node_modules\/json-schema\/lib\/validate\.js/,
     preLoaders: [
-      {
-        test: /\.vue$/,
-        loader: 'eslint',
-        include: projectRoot,
-        exclude: /node_modules/
-      },
-      {
-        test: /\.js$/,
-        loader: 'eslint',
-        include: projectRoot,
-        exclude: /vue-devtools|node_modules/
-      }
+      
     ],
     loaders: [
       {

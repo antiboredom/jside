@@ -1,0 +1,4 @@
+<div :class="{'selected': selected}">
+	<a href="#" v-show="!hidden" @click="$root.openFile(path)">{{name}}{{editing}}</a>&nbsp;
+	<a class="delete" href="#" v-show="!hidden" @click="$root.closeFile(path)"></a>
+</div>

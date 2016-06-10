@@ -1,0 +1,4 @@
+<div class="item" :class="[className]" v-show="!hidden" @click="openFile" @contextmenu="popupMenu(this, $event)">
+  <span class="icon" :class="[icon]"></span>
+  {{item.name}}
+</div>
