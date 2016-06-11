@@ -31,19 +31,19 @@ const mainURL = process.env.HOT
   ? `http://localhost:${process.env.PORT}/main.html`
   : 'file://' + Path.join(__dirname, 'main.html')
 
-function createWindow (winSettings = defaultWinSettings) {
+function createWindow (url = mainURL, winSettings = defaultWinSettings) {
   const win = window.createWindow(winSettings)
 
-  win.showUrl(mainURL)
+  win.showUrl(url)
 
   if (process.env.NODE_ENV !== 'production') {
     win.openDevTools()
   }
 }
 
-ipcMain.on('createWindow', (event, arg) => {
-  console.log(arg)
-  createWindow(arg)
+ipcMain.on('createWindow', (event, url, settings) => {
+  console.log(settings)
+  createWindow(url, settings)
 })
 
 app.on('ready', () => {

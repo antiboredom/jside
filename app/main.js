@@ -235,7 +235,7 @@ new Vue({
         show: true
       }, options)
 
-      ipcRenderer.send('createWindow', winSettings)
+      ipcRenderer.send('createWindow', url, winSettings)
 
       return null
     },
