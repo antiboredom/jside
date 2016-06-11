@@ -121,8 +121,8 @@ new Vue({
     let win = remote.getCurrentWindow()
     win.setMinimumSize(400, 400)
     if (($(window).width() + 100 >= screen.width) || ($(window).height() + 100 >= screen.height)) {
-      console.log(`screen width=${screen.width}. screen height=${screen.height}`)
-      console.log(`setsize width=${(screen.width * 4) / 5}. set size height=${(screen.height * 7) / 8}`)
+      // console.log(`screen width=${screen.width}. screen height=${screen.height}`)
+      // console.log(`setsize width=${(screen.width * 4) / 5}. set size height=${(screen.height * 7) / 8}`)
       win.setSize(Math.floor((screen.width * 4) / 5), Math.floor((screen.height * 7) / 8))
     }
   },
@@ -284,7 +284,7 @@ new Vue({
       let watcher = chokidar.watch(path, {
         ignoreInitial: true,
         ignored: function (filepath) {
-          let regex = new RegExp(path + '/.*/.+')
+          let regex = new RegExp(path + '\/.*\/.+')
           return regex.test(filepath)
         }
       })
@@ -549,6 +549,3 @@ new Vue({
 
   }
 })
-
-console.log('this is the vue app')
-console.log(remote.getGlobal('sharedObj').vueApp)

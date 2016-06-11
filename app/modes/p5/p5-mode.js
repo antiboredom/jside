@@ -29,8 +29,6 @@ module.exports = {
       forceDelete: true
     })
 
-    console.log('this in p5-mode newProject is')
-    console.log(this)
     this.projectPath = tempProject
 
     // open the project and file
@@ -290,8 +288,6 @@ function startServer (path, app, callback) {
 
       function handler (request, response) {
         request.addListener('end', function () {
-          console.log('request to static server:')
-          console.log(request)
           file.serve(request, response)
         }).resume()
       }

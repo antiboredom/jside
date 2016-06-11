@@ -47,8 +47,6 @@
     },
 
     ready: function() {
-      console.log("ready this")
-      console.log(this)
       this.sessions = []
 
       this.ace = window.ace = ace.edit(this.$els.editor)
@@ -156,8 +154,6 @@
         }]
 
         commands.forEach(function(command){
-          console.log("commands foreach this")
-          console.log(self)
           self.ace.commands.addCommand(command)
         })
 

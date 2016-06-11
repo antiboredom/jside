@@ -23,7 +23,7 @@ let isMac = process.platform === 'darwin'
 let isLinux = process.platform === 'linux'
 
 let vueApp = null
-global.sharedObj = {isWin, isMac, isLinux, vueApp}
+global.sharedObj = {isWin: isWin, isMac: isMac, isLinux: isLinux, vueApp: vueApp}
 
 // Load the HTML file directly from the webpack dev server if
 // hot reload is enabled, otherwise load the local file.
