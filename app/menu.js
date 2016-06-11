@@ -11,6 +11,8 @@ let isWin = remote.getGlobal('sharedObj').isWin
 let isLinux = remote.getGlobal('sharedObj').isLinux
 let isMac = remote.getGlobal('sharedObj').isMac
 
+let menu
+
 const fs = require('fs')
 
 module.exports.setup = function (app) {
@@ -266,6 +268,10 @@ module.exports.setup = function (app) {
     helpMenu
   ])
 
-  const menu = Menu.buildFromTemplate(template)
+  menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+}
+
+module.exports.resetMenu = () => {
   Menu.setApplicationMenu(menu)
 }

@@ -19,7 +19,7 @@ let modes = {
 
 const shell = require('electron').shell
 const remote = require('electron').remote
-const BrowserWindow = require('electron').remote.BrowserWindow
+const ipcRenderer = require('electron').ipcRenderer
 
 require('./Window')
 
@@ -158,33 +158,33 @@ new Vue({
     setupCloseHandler: function () {
       let self = this
       let win = remote.getCurrentWindow()
-      win.on('close', function (closeEvent) {
-        // check to see if there are unsaved files
-        let shouldClose = true
-        if (_.any(self.files, function (f) { return f.contents !== f.lastSavedContents })) {
-          shouldClose = confirm('You have unsaved files. Quit and lose changes?')
-        }
-        if (shouldClose) {
-          // clean up output window
-          if (self.outputWindow) {
-            self.outputWindow.close()
-          }
+      // win.on('close', function (closeEvent) {
+      //   // check to see if there are unsaved files
+      //   let shouldClose = true
+      //   if (_.any(self.files, function (f) { return f.contents !== f.lastSavedContents })) {
+      //     shouldClose = confirm('You have unsaved files. Quit and lose changes?')
+      //   }
+      //   if (shouldClose) {
+      //     // clean up output window
+      //     if (self.outputWindow) {
+      //       self.outputWindow.close()
+      //     }
 
-          // save window state if the user quit the program
-          if (closeEvent === 'quit') {
-            // windowstate.save(self, win)
-          }
+      //     // save window state if the user quit the program
+      //     if (closeEvent === 'quit') {
+      //       // windowstate.save(self, win)
+      //     }
 
-          // windowstate.decrementWindows()
-          // if (windowstate.totalWindows() < 1) {
-          //   gui.App.quit()
-          // }
+      //     // windowstate.decrementWindows()
+      //     // if (windowstate.totalWindows() < 1) {
+      //     //   gui.App.quit()
+      //     // }
 
-          // close this window
-          // this.close(true)
-          // win.close()
-        }
-      })
+      //     // close this window
+      //     // this.close(true)
+      //     // win.close()
+      //   }
+      // })
 
       win.on('focus', function () {
         self.focused = true
@@ -227,22 +227,17 @@ new Vue({
     newWindow: function (url, options) {
       let currentWindow = remote.getCurrentWindow()
 
-      let win = new BrowserWindow(_.extend({
+      let winSettings = _.extend({
         x: currentWindow.x + 50,
         y: currentWindow.y + 50,
         width: 1024,
         height: 768,
         show: true
-      }, options))
-      win.loadURL(url)
+      }, options)
 
-      win.openDevTools()
+      ipcRenderer.send('createWindow', winSettings)
 
-      win.on('closed', () => {
-        remote.getGlobal('sharedObj').windows.pop(remote.getGlobal('sharedObj').windows.indexOf(this))
-      })
-      remote.getGlobal('sharedObj').windows.push(win)
-      return win
+      return null
     },
 
     // open an existing project with a new window
@@ -284,7 +279,7 @@ new Vue({
     },
 
     resetMenu: function () {
-      // menu.resetMenu()
+      menu.resetMenu()
     },
 
     // watch the project file tree for changes

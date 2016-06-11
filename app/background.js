@@ -3,16 +3,16 @@
 // It doesn't have any windows which you can see on screen, but we can open
 // window from here.
 
-import { app, BrowserWindow } from 'electron'
+import { app, ipcMain } from 'electron'
 import Path from 'path'
+const window = require('electron-window')
 // import fs from 'fs'
 
-var winSettings = {
+var defaultWinSettings = {
   x: 50,
   y: 50,
   width: 1024,
-  height: 768,
-  show: false
+  height: 768
 }
 
 console.log(`platform is ${process.platform}`)
@@ -23,7 +23,7 @@ let isMac = process.platform === 'darwin'
 let isLinux = process.platform === 'linux'
 
 let vueApp = null
-global.sharedObj = {windows: [], isWin, isMac, isLinux, vueApp}
+global.sharedObj = {isWin, isMac, isLinux, vueApp}
 
 // Load the HTML file directly from the webpack dev server if
 // hot reload is enabled, otherwise load the local file.
@@ -31,24 +31,20 @@ const mainURL = process.env.HOT
   ? `http://localhost:${process.env.PORT}/main.html`
   : 'file://' + Path.join(__dirname, 'main.html')
 
-function createWindow () {
-  console.log('called create window')
-  let win = new BrowserWindow(winSettings)
+function createWindow (winSettings = defaultWinSettings) {
+  const win = window.createWindow(winSettings)
 
-  win.loadURL(mainURL)
+  win.showUrl(mainURL)
 
   if (process.env.NODE_ENV !== 'production') {
     win.openDevTools()
   }
-
-  win.on('closed', () => {
-    global.sharedObj.windows.pop(global.sharedObj.windows.indexOf(this))
-  })
-
-  global.sharedObj.windows.push(win)
-
-  win.show()
 }
+
+ipcMain.on('createWindow', (event, arg) => {
+  console.log(arg)
+  createWindow(arg)
+})
 
 app.on('ready', () => {
   createWindow()
