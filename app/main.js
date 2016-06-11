@@ -21,6 +21,9 @@ const shell = require('electron').shell
 const remote = require('electron').remote
 const ipcRenderer = require('electron').ipcRenderer
 
+// only call if `preload` is set in `windowOptions`
+require('electron-window').parseArgs()
+
 require('./Window')
 
 // import App from './App'
@@ -40,8 +43,8 @@ new Vue({
 
   data: {
     title: 'Untitled',
-    projectPath: window.PATH,
-    unsaved: window.UNSAVED,
+    projectPath: window.__args__.PATH,
+    unsaved: window.__args__.UNSAVED,
     windowURL: window.location.href,
     temp: true,
     running: false,
@@ -189,19 +192,19 @@ new Vue({
       win.on('focus', function () {
         self.focused = true
         self.resetMenu()
-        if (self.askReload) {
-          self.askReload = false
-          let shouldRefresh = confirm(self.currentFile.path + ' was edited on the disk. Reload? You will lose any changes.')
-          if (shouldRefresh) {
-            let win = self.newWindow(self.windowURL)
-            // windowstate.decrementWindows()
+        // if (self.askReload) {
+        //   self.askReload = false
+        //   let shouldRefresh = confirm(self.currentFile.path + ' was edited on the disk. Reload? You will lose any changes.')
+        //   if (shouldRefresh) {
+        //     let win = self.newWindow(self.windowURL)
+        //     // windowstate.decrementWindows()
 
-            win.webContents.on('did-finish-load', function () {
-              win.webContents.executeJavaScript(`window.PATH = '${self.currentFile.path}'`)
-              remote.getCurrentWindow().close()
-            })
-          }
-        }
+        //     win.webContents.on('did-finish-load', function () {
+        //       win.webContents.executeJavaScript(`window.PATH = '${self.currentFile.path}'`)
+        //       remote.getCurrentWindow().close()
+        //     })
+        //   }
+        // }
       })
 
       win.on('blur', function () {
@@ -224,7 +227,7 @@ new Vue({
     },
 
     // create a new window 50px below current window
-    newWindow: function (url, options) {
+    newWindow: function (url, options, preloadArgs) {
       let currentWindow = remote.getCurrentWindow()
 
       let winSettings = _.extend({
@@ -235,9 +238,7 @@ new Vue({
         show: true
       }, options)
 
-      ipcRenderer.send('createWindow', url, winSettings)
-
-      return null
+      ipcRenderer.send('createWindow', url, winSettings, preloadArgs)
     },
 
     // open an existing project with a new window
@@ -249,23 +250,16 @@ new Vue({
     },
 
     openProject: function (path, temp) {
-      // create the new window
-      let win = this.newWindow(this.windowURL)
-
       // set the project path of the new window
-      win.webContents.on('did-finish-load', function () {
-        if (fs.lstatSync(path).isDirectory()) {
-          let sketchPath = Path.join(path, 'sketch.js')
-          if (fs.existsSync(sketchPath)) path = sketchPath
-        }
-        // win.window.PATH = path
-        win.webContents.executeJavaScript(`window.PATH = '${path}'`)
-        if (typeof temp === 'boolean' && temp === true) {
-          // win.window.UNSAVED = true
-          win.webContents.executeJavaScript('window.UNSAVED = true')
-        }
-      })
-      return win
+      if (fs.lstatSync(path).isDirectory()) {
+        let sketchPath = Path.join(path, 'sketch.js')
+        if (fs.existsSync(sketchPath)) path = sketchPath
+      }
+      if (temp !== true) { temp = false }
+      let preloadArgs = {PATH: path, UNSAVED: temp}
+
+      // create the new window
+      this.newWindow(this.windowURL, null, preloadArgs)
     },
 
     // load project files
