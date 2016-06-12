@@ -234,8 +234,7 @@ new Vue({
         x: currentWindow.x + 50,
         y: currentWindow.y + 50,
         width: 1024,
-        height: 768,
-        show: true
+        height: 768
       }, options)
 
       ipcRenderer.send('createWindow', url, winSettings, preloadArgs)
