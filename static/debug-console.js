@@ -242,19 +242,22 @@ if (typeof JSON.retrocycle !== 'function') {
   require('electron-window').parseArgs();
 
   var remote = require('electron').remote;
-  // var ipcRenderer = require('electron').ipcRenderer
 
   var original = window.console;
   window.console = {};
   window._isNodeWebkit = true;
 
   window.sendMessageToParent = (message) => {
+    original.log("Sending message to parent window")
+    original.log(message)
     let parentWinId = window.__args__.parentWindowId
     let parentWin = remote.BrowserWindow.fromId(parentWinId)
-    parentWin.webContents.executeJavaScript(`
-      window.receievedMessage = \`${message}\`;
-      window.receieveDebugMessage();
-    `)
+    // parentWin.webContents.executeJavaScript(`
+    //   window.receievedMessage = \`${message}\`;
+    //   window.receieveDebugMessage();
+    // `)
+
+    parentWin.webContents.send('debugMessage', message)
   }
 
   ["log", "warn", "error"].forEach(function(func) {

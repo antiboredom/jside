@@ -13,6 +13,7 @@
   var AutoLinker = require('autolinker')
   var Path = require('path')
   var fs = require('fs')
+  var ipcRenderer = require('electron').ipcRenderer
 
   module.exports = {
     name: 'Debug',
@@ -114,8 +115,8 @@
       this.debugWidth = container.width()
       var self = this
 
-      window.receieveDebugMessage = () => {
-        const debugData = window.receievedMessage
+      ipcRenderer.on('debugMessage', (event, message) => {
+        const debugData = message
         console.log(debugData)
         if (typeof debugData === 'string') {
           var data = JSON.parse(debugData)
@@ -136,7 +137,7 @@
             })
           }
         }
-      }
+      })
     }
 
   }
