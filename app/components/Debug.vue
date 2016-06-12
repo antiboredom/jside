@@ -114,10 +114,11 @@
       this.debugWidth = container.width()
       var self = this
 
-      window.addEventListener('message', function (event) {
-        console.log(event)
-        if (typeof event.data === 'string') {
-          var data = JSON.parse(event.data)
+      window.receieveDebugMessage = () => {
+        const debugData = window.receievedMessage
+        console.log(debugData)
+        if (typeof debugData === 'string') {
+          var data = JSON.parse(debugData)
           if (data.console) {
             self.debugOut(data.console)
           }
@@ -135,7 +136,7 @@
             })
           }
         }
-      }, false)
+      }
     }
 
   }

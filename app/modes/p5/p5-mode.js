@@ -151,7 +151,7 @@ module.exports = {
                 width: self.outW,
                 height: self.outH,
                 injectDebug: true
-              })
+              }, {parentWindowId: remote.getCurrentWindow().id})
 
               prevCanvasWidth = canvasWidth
               prevCanvasHeight = canvasHeight
