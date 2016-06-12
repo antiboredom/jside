@@ -183,6 +183,73 @@ module.exports.setup = function (app) {
     }
   })
 
+  let editMenu = {
+    label: 'Edit',
+    submenu: [
+      {
+        label: 'Undo',
+        accelerator: 'CmdOrCtrl+Z',
+        click () {
+          app.$refs.editor.ace.execCommand('undo')
+        }
+      },
+      {
+        label: 'Redo',
+        accelerator: 'Shift+CmdOrCtrl+Z',
+        click () {
+          app.$refs.editor.ace.execCommand('redo')
+        }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Cut',
+        accelerator: 'CmdOrCtrl+X',
+        role: 'cut'
+      },
+      {
+        label: 'Copy',
+        accelerator: 'CmdOrCtrl+C',
+        role: 'copy'
+      },
+      {
+        label: 'Paste',
+        accelerator: 'CmdOrCtrl+V',
+        role: 'paste'
+      },
+      {
+        label: 'Delete',
+        accelerator: 'CmdOrCtrl+D',
+        click () {
+          app.$refs.editor.ace.execCommand('del')
+        }
+      },
+      {
+        label: 'Select All',
+        accelerator: 'CmdOrCtrl+A',
+        role: 'selectall'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Find',
+        accelerator: 'CmdOrCtrl+F',
+        click () {
+          app.$refs.editor.ace.execCommand('find')
+        }
+      },
+      {
+        label: 'Find and Replace',
+        accelerator: 'CmdOrCtrl+Alt+F',
+        click () {
+          app.$refs.editor.ace.execCommand('replace')
+        }
+      }
+    ]
+  }
+
   let viewMenu = {
     label: 'View',
     submenu: [
@@ -267,6 +334,8 @@ module.exports.setup = function (app) {
     viewMenu,
     helpMenu
   ])
+
+  template.splice(1, 0, editMenu)
 
   menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
