@@ -267,7 +267,7 @@ module.exports.setup = function (app) {
         label: 'Reformat',
         accelerator: 'CmdOrCtrl+T',
         click (item, focusedWindow) {
-          app.$els.editor.reformat()
+          app.$refs.editor.reformat()
         }
       },
       {
