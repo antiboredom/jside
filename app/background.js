@@ -31,6 +31,8 @@ const mainURL = process.env.HOT
   ? `http://localhost:${process.env.PORT}/main.html`
   : 'file://' + Path.join(__dirname, 'main.html')
 
+const debugInjectJSURL = Path.join(__dirname, 'static', 'debug-console.js')
+
 function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
 
@@ -47,6 +49,13 @@ function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadA
 
 ipcMain.on('createWindow', (event, url, settings, preloadArgs) => {
   console.log(settings)
+  if (settings.injectDebug === true) {
+    delete settings.injectDebug
+    if (!settings.webPreferences) {
+      settings.webPreferences = {}
+    }
+    settings.webPreferences.preload = debugInjectJSURL
+  }
   createWindow(url, settings, preloadArgs)
 })
 

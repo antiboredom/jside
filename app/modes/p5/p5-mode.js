@@ -149,35 +149,32 @@ module.exports = {
                 x: self.outX,
                 y: self.outY,
                 width: self.outW,
-                height: self.outH
+                height: self.outH,
+                injectDebug: true
               })
 
               prevCanvasWidth = canvasWidth
               prevCanvasHeight = canvasHeight
 
-              self.outputWindow.webContents.on('did-finish-load', function () {
-                self.outputWindow.show()
-              })
+              // self.outputWindow.on('close', function () {
+              //   self.outX = self.outputWindow.x
+              //   self.outY = self.outputWindow.y
+              //   self.outW = self.outputWindow.width
 
-              self.outputWindow.on('close', function () {
-                self.outX = self.outputWindow.x
-                self.outY = self.outputWindow.y
-                self.outW = self.outputWindow.width
+              //   // the "-55" appears to fix the growing window issue,
+              //   // & resulting gasslighting of myself
+              //   self.outH = self.outputWindow.height - 55
+              //   self.running = false
+              //   self.outputWindow = null
+              // })
 
-                // the "-55" appears to fix the growing window issue,
-                // & resulting gasslighting of myself
-                self.outH = self.outputWindow.height - 55
-                self.running = false
-                self.outputWindow = null
-              })
+              // self.outputWindow.on('focus', function () {
+              //   self.resetMenu()
+              // })
 
-              self.outputWindow.on('focus', function () {
-                self.resetMenu()
-              })
-
-              self.outputWindow.on('resize', function () {
-                self.resizedOutputWindow = true
-              })
+              // self.outputWindow.on('resize', function () {
+              //   self.resizedOutputWindow = true
+              // })
             })
           }
           self.running = true

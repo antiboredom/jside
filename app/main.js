@@ -38,6 +38,7 @@ new Vue({
     editor: require('./components/Editor'),
     sidebar: require('./components/Sidebar'),
     settings: require('./components/Settings'),
+    debug: require('./components/Debug'),
     tabs: require('./components/Tabs')
   },
 

@@ -6,7 +6,13 @@
   "author": "Sam Lavigne",
   "main": "background.js",
   "dependencies": {
+    "JSON2": "^0.1.0",
+    "autolinker": "^0.17.1",
+    "br-mousetrap": "~1.1.3",
+    "brace": "git+https://gigit@github.com/antiboredom/brace.git",
+    "chokidar": "1.0.5",
     "jquery": "2.2.2",
+    "js-beautify": "~1.5.1",
     "node-static": "0.7.6",
     "p5.serialserver": "git://github.com/davejm/p5.serialport.git#master",
     "portscanner": "1.0.0",
@@ -14,12 +20,7 @@
     "semver": "~3.0.1",
     "serialport": "3.1.2",
     "trash": "~0.1.2",
-    "wrench": "~1.5.8",
     "underscore": "~1.6.0",
-    "js-beautify": "~1.5.1",
-    "br-mousetrap": "~1.1.3",
-    "brace": "git+https://gigit@github.com/antiboredom/brace.git",
-    "autolinker": "^0.17.1",
-    "chokidar": "1.0.5"
+    "wrench": "~1.5.8"
   }
 }
