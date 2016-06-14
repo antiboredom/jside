@@ -45,7 +45,8 @@
             height: startHeight - (e.clientY - startY)
           })
           self.debugWidth = startHeight - (e.clientY - startY)
-          self.ace.resize()
+          // console.log(self)
+          window.ace.resize()
         }).on('mouseup', function (e) {
           $(document).off('mouseup').off('mousemove')
         })
@@ -61,7 +62,7 @@
             width: startWidth - (e.clientX - startX)
           })
           self.debugWidth = startWidth - (e.clientX - startX)
-          self.ace.resize()
+          window.ace.resize()
         }).on('mouseup', function (e) {
           $(document).off('mouseup').off('mousemove')
         })
