@@ -141,37 +141,7 @@ module.exports.setup = function (app) {
 
   // add menu option for loading example sketches
   let examplesMenu = {label: 'Examples'}
-
-  // create submenu
-  let exampleDir = Path.join('static', 'mode_assets', 'p5', 'examples')
-
-  // get latest example categories
-  let files = fs.readdirSync(exampleDir)
-  let exampleCategorySubMenu = []
-
-  files.forEach(function (category) {
-    let sketchMenu = []
-    let categoryLabel = {label: category}
-    // populate submenu with sketches for that category
-    let categoryDir = Path.join(exampleDir, category)
-    if (fs.lstatSync(categoryDir).isDirectory()) {
-      let sketches = fs.readdirSync(categoryDir)
-      sketches.forEach(function (fileName) {
-        sketchMenu.push(
-          {
-            label: Files.cleanExampleName(fileName),
-            click (item, focusedWindow) {
-              app.modeFunction('launchExample', exampleDir.concat('/').concat(category).concat('/').concat(fileName))
-            }
-          }
-        )
-      })
-      categoryLabel.submenu = sketchMenu
-      exampleCategorySubMenu.push(categoryLabel)
-    }
-  })
-
-  examplesMenu.submenu = exampleCategorySubMenu
+  examplesMenu.submenu = makeExampleCategorySubMenu(app)
   fileMenu.submenu.push(examplesMenu)
 
   fileMenu.submenu.push({type: 'separator'})
@@ -346,3 +316,35 @@ module.exports.setup = function (app) {
 // module.exports.resetMenu = () => {
 //   Menu.setApplicationMenu(menu)
 // }
+
+function makeExampleCategorySubMenu (app) {
+  // create submenu
+  let exampleDir = Path.join('static', 'mode_assets', 'p5', 'examples')
+
+  // get latest example categories
+  let files = fs.readdirSync(exampleDir)
+  let exampleCategorySubMenu = []
+
+  files.forEach(function (category) {
+    let sketchMenu = []
+    let categoryLabel = {label: category}
+    // populate submenu with sketches for that category
+    let categoryDir = Path.join(exampleDir, category)
+    if (fs.lstatSync(categoryDir).isDirectory()) {
+      let sketches = fs.readdirSync(categoryDir)
+      sketches.forEach(function (fileName) {
+        sketchMenu.push(
+          {
+            label: Files.cleanExampleName(fileName),
+            click (item, focusedWindow) {
+              app.modeFunction('launchExample', exampleDir.concat('/').concat(category).concat('/').concat(fileName))
+            }
+          }
+        )
+      })
+      categoryLabel.submenu = sketchMenu
+      exampleCategorySubMenu.push(categoryLabel)
+    }
+  })
+  return exampleCategorySubMenu
+}

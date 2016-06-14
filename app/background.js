@@ -72,6 +72,7 @@ function createOutputWindow (url, parentWinId, winSettings, preloadArgs) {
     // console.log('Output window\'s bounds:')
     // console.log(outputWindow.getBounds())
     const outWinBounds = outputWindow.getBounds()
+    window.windows[parentWinId].outputWinId = null
     window.windows[parentWinId].webContents.send('outputWinClose', outWinBounds)
 
     console.log(`Closed output window's parent win id=${parentWinId}`)
