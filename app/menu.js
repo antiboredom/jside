@@ -144,6 +144,11 @@ module.exports.setup = function (app) {
   examplesMenu.submenu = makeExampleCategorySubMenu(app)
   fileMenu.submenu.push(examplesMenu)
 
+  // Control the serial server
+  let importLibsMenu = { label: 'Import Library' }
+  importLibsMenu.submenu = makeImportLibsSubMenu(app)
+  fileMenu.submenu.push(importLibsMenu)
+
   fileMenu.submenu.push({type: 'separator'})
 
   fileMenu.submenu.push({
@@ -347,4 +352,18 @@ function makeExampleCategorySubMenu (app) {
     }
   })
   return exampleCategorySubMenu
+}
+
+function makeImportLibsSubMenu (app) {
+  let importLibsSubMenu = []
+  let libFiles = fs.readdirSync(Path.join('static', 'mode_assets', 'p5', 'libraries'))
+  libFiles.forEach(function (lib) {
+    importLibsSubMenu.push({
+      label: Path.basename(lib),
+      click: () => {
+        app.modeFunction('addLibrary', lib)
+      }
+    })
+  })
+  return importLibsSubMenu
 }
