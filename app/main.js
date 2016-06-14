@@ -19,6 +19,7 @@ let modes = {
 
 const shell = require('electron').shell
 const remote = require('electron').remote
+const dialog = remote.dialog
 const ipcRenderer = require('electron').ipcRenderer
 
 // only call if `preload` is set in `windowOptions`
@@ -59,7 +60,8 @@ let vueApp = new Vue({
     fileTypes: ['txt', 'html', 'css', 'js', 'json', 'scss', 'xml', 'csv', 'less'],
     outX: 50,
     outY: 50,
-    currentFile: {}
+    currentFile: {},
+    dialogIsOpen: false
   },
 
   computed: {
@@ -154,7 +156,6 @@ let vueApp = new Vue({
     // (I should move this over to vuejs but it wasn't dealing
     // with the html file element properly)
     setupFileListener: function () {
-      $('#openFile').change(this.open.bind(this))
       $('#saveFile').change(this.saveAs.bind(this))
       $('#saveProject').change(this.saveProjectAs.bind(this))
     },
@@ -257,11 +258,20 @@ let vueApp = new Vue({
     },
 
     // open an existing project with a new window
-    open: function (event) {
-      let path = event.target.files[0].path
-      this.openProject(path)
-      // reset value in case the user wants to open the same file more than once
-      $('#openFile').val('')
+    open: function () {
+      if (!this.dialogIsOpen) {
+        this.dialogIsOpen = true
+        dialog.showOpenDialog({
+          title: 'Open File',
+          properties: ['openFile']
+        }, (filenames) => {
+          console.log(filenames)
+          this.dialogIsOpen = false
+          if (filenames === undefined) return
+          let path = filenames[0]
+          this.openProject(path)
+        })
+      }
     },
 
     openProject: function (path, temp) {

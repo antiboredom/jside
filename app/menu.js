@@ -108,7 +108,8 @@ module.exports.setup = function (app) {
         label: 'Open',
         accelerator: 'CmdOrCtrl+O',
         click (item, focusedWindow) {
-          $('#openFile').trigger('click')
+          // $('#openFile').trigger('click')
+          app.open()
         }
       }
     ]
