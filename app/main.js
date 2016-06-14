@@ -29,7 +29,7 @@ require('./Window')
 // import App from './App'
 
 /* eslint-disable no-new */
-new Vue({
+let vueApp = new Vue({
   el: '#app',
 
   mode: modes.p5,
@@ -160,8 +160,8 @@ new Vue({
     },
 
     setupCloseHandler: function () {
-      let self = this
-      let win = remote.getCurrentWindow()
+      // let self = this
+      // let win = remote.getCurrentWindow()
       // win.on('close', function (closeEvent) {
       //   // check to see if there are unsaved files
       //   let shouldClose = true
@@ -190,27 +190,27 @@ new Vue({
       //   }
       // })
 
-      win.on('focus', function () {
-        self.focused = true
-        self.resetMenu()
-        // if (self.askReload) {
-        //   self.askReload = false
-        //   let shouldRefresh = confirm(self.currentFile.path + ' was edited on the disk. Reload? You will lose any changes.')
-        //   if (shouldRefresh) {
-        //     let win = self.newWindow(self.windowURL)
-        //     // windowstate.decrementWindows()
+      // win.on('focus', function () {
+      //   self.focused = true
+      //   self.resetMenu()
+      //   // if (self.askReload) {
+      //   //   self.askReload = false
+      //   //   let shouldRefresh = confirm(self.currentFile.path + ' was edited on the disk. Reload? You will lose any changes.')
+      //   //   if (shouldRefresh) {
+      //   //     let win = self.newWindow(self.windowURL)
+      //   //     // windowstate.decrementWindows()
 
-        //     win.webContents.on('did-finish-load', function () {
-        //       win.webContents.executeJavaScript(`window.PATH = '${self.currentFile.path}'`)
-        //       remote.getCurrentWindow().close()
-        //     })
-        //   }
-        // }
-      })
+      //   //     win.webContents.on('did-finish-load', function () {
+      //   //       win.webContents.executeJavaScript(`window.PATH = '${self.currentFile.path}'`)
+      //   //       remote.getCurrentWindow().close()
+      //   //     })
+      //   //   }
+      //   // }
+      // })
 
-      win.on('blur', function () {
-        self.focused = false
-      })
+      // win.on('blur', function () {
+      //   self.focused = false
+      // })
     },
 
     // todo: setup drag and drop
@@ -230,6 +230,7 @@ new Vue({
     // create a new window 50px below current window
     newWindow: function (url, options, preloadArgs) {
       let currentWindow = remote.getCurrentWindow()
+      console.log(`Current BrowserWindow id=${currentWindow.id}`)
 
       let winSettings = _.extend({
         x: currentWindow.x + 50,
@@ -239,6 +240,20 @@ new Vue({
       }, options)
 
       ipcRenderer.send('createWindow', url, winSettings, preloadArgs)
+    },
+
+    newOutputWindow: function (url, options, preloadArgs) {
+      let currentWindow = remote.getCurrentWindow()
+      console.log(`Current BrowserWindow id=${currentWindow.id}`)
+
+      let winSettings = _.extend({
+        x: currentWindow.x + 50,
+        y: currentWindow.y + 50,
+        width: 1024,
+        height: 768
+      }, options)
+
+      ipcRenderer.send('createOutputWindow', url, winSettings, preloadArgs)
     },
 
     // open an existing project with a new window
@@ -548,4 +563,28 @@ new Vue({
     }
 
   }
+})
+
+ipcRenderer.on('winFocused', () => {
+  vueApp.resetMenu()
+})
+
+ipcRenderer.on('outputWinClose', (event, winBounds) => {
+  console.log('Output win close ipc event received')
+  vueApp.outX = winBounds.x
+  vueApp.outY = winBounds.y
+  vueApp.outW = winBounds.width
+  vueApp.outH = winBounds.height
+  vueApp.running = false
+  vueApp.outputWindow = false
+})
+
+ipcRenderer.on('outputWinFocused', () => {
+  console.log('Output win focused ipc event received')
+  vueApp.resetMenu()
+})
+
+ipcRenderer.on('outputWinResized', () => {
+  console.log('Output win resized ipc event received')
+  vueApp.resizedOutputWindow = true
 })

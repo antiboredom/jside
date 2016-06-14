@@ -145,36 +145,16 @@ module.exports = {
                 self.outH = canvasHeight
               }
 
-              self.outputWindow = self.newWindow(url, {
+              self.outputWindow = true
+              self.newOutputWindow(url, {
                 x: self.outX,
                 y: self.outY,
                 width: self.outW,
-                height: self.outH,
-                injectDebug: true
+                height: self.outH
               }, {parentWindowId: remote.getCurrentWindow().id})
 
               prevCanvasWidth = canvasWidth
               prevCanvasHeight = canvasHeight
-
-              // self.outputWindow.on('close', function () {
-              //   self.outX = self.outputWindow.x
-              //   self.outY = self.outputWindow.y
-              //   self.outW = self.outputWindow.width
-
-              //   // the "-55" appears to fix the growing window issue,
-              //   // & resulting gasslighting of myself
-              //   self.outH = self.outputWindow.height - 55
-              //   self.running = false
-              //   self.outputWindow = null
-              // })
-
-              // self.outputWindow.on('focus', function () {
-              //   self.resetMenu()
-              // })
-
-              // self.outputWindow.on('resize', function () {
-              //   self.resizedOutputWindow = true
-              // })
             })
           }
           self.running = true
@@ -189,7 +169,9 @@ module.exports = {
     //   nodeGlobal.serialRunning = false
     // }
     if (this.outputWindow) {
-      this.outputWindow.close()
+      let outputWinId = remote.getCurrentWindow().outputWinId
+      console.log(`output win id=${outputWinId}`)
+      remote.BrowserWindow.fromId(outputWinId).close()
     } else {
       this.running = false
     }

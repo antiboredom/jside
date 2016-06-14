@@ -243,6 +243,9 @@ if (typeof JSON.retrocycle !== 'function') {
 
   var remote = require('electron').remote;
 
+  // Set parentWindowId on the BrowserWindow object
+  // remote.getCurrentWindow().parentWindowId = window.__args__.parentWindowId;
+
   var original = window.console;
   window.console = {};
   window._isNodeWebkit = true;

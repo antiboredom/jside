@@ -36,6 +36,10 @@ const debugInjectJSURL = Path.join(__dirname, 'static', 'debug-console.js')
 function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
 
+  win.on('focus', (event) => {
+    event.sender.send('winFocused')
+  })
+
   if (preloadArgs) {
     win.showURL(url, preloadArgs)
   } else {
@@ -47,16 +51,59 @@ function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadA
   }
 }
 
-ipcMain.on('createWindow', (event, url, settings, preloadArgs) => {
-  console.log(settings)
-  if (settings.injectDebug === true) {
-    delete settings.injectDebug
-    if (!settings.webPreferences) {
-      settings.webPreferences = {}
-    }
-    settings.webPreferences.preload = debugInjectJSURL
+function createOutputWindow (url, parentWinId, winSettings, preloadArgs) {
+  const win = window.createWindow(winSettings)
+  window.windows[parentWinId].outputWinId = win.id
+  console.log(`window.windows[parentWinId].outputWinId = ${window.windows[parentWinId].outputWinId}`)
+  win.parentWinId = parentWinId
+  console.log(`new output window id = ${win.id}`)
+
+  win.on('close', (event) => {
+    // console.log(event.sender.id)
+    const outputWindow = event.sender
+    const parentWinId = outputWindow.parentWinId
+    // console.log('Output window\'s bounds:')
+    // console.log(outputWindow.getBounds())
+    const outWinBounds = outputWindow.getBounds()
+    window.windows[parentWinId].webContents.send('outputWinClose', outWinBounds)
+
+    console.log(`Closed output window's parent win id=${parentWinId}`)
+  })
+
+  win.on('focus', (event) => {
+    const outputWindow = event.sender
+    const parentWinId = outputWindow.parentWinId
+    const parentWindow = window.windows[parentWinId]
+    parentWindow.webContents.send('outputWinFocused')
+  })
+
+  win.on('resize', (event) => {
+    const outputWindow = event.sender
+    const parentWinId = outputWindow.parentWinId
+    const parentWindow = window.windows[parentWinId]
+    parentWindow.webContents.send('outputWinResized')
+  })
+
+  if (preloadArgs) {
+    win.showURL(url, preloadArgs)
+  } else {
+    win.showURL(url)
   }
+
+  console.log(`Length of windows array after creating window ${Object.keys(window.windows).length}`)
+}
+
+ipcMain.on('createWindow', (event, url, settings, preloadArgs) => {
   createWindow(url, settings, preloadArgs)
+})
+
+ipcMain.on('createOutputWindow', (event, url, settings, preloadArgs) => {
+  let parentWinId = event.sender.getOwnerBrowserWindow().id
+  if (!settings.webPreferences) {
+    settings.webPreferences = {}
+  }
+  settings.webPreferences.preload = debugInjectJSURL
+  createOutputWindow(url, parentWinId, settings, preloadArgs)
 })
 
 app.on('ready', () => {
