@@ -134,7 +134,7 @@ module.exports.setup = function (app) {
       label: 'Save As...',
       accelerator: 'CmdOrCtrl+Shift+S',
       click (item, focusedWindow) {
-        $('#saveProject').trigger('click')
+        app.saveProjectAs()
       }
     }
   ])

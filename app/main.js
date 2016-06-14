@@ -112,7 +112,7 @@ let vueApp = new Vue({
             self.$broadcast('open-nested-file', filename)
           }
         }
-        remote.getCurrentWindow().show()
+        // remote.getCurrentWindow().show()
       })
 
       // menu.updateRecentFiles(this, this.projectPath)
@@ -156,8 +156,8 @@ let vueApp = new Vue({
     // (I should move this over to vuejs but it wasn't dealing
     // with the html file element properly)
     setupFileListener: function () {
-      $('#saveFile').change(this.saveAs.bind(this))
-      $('#saveProject').change(this.saveProjectAs.bind(this))
+      // $('#saveFile').change(this.saveAs.bind(this))
+      // $('#saveProject').change(this.saveProjectAs.bind(this))
     },
 
     setupCloseHandler: function () {
@@ -266,6 +266,7 @@ let vueApp = new Vue({
           properties: ['openFile']
         }, (filenames) => {
           console.log(filenames)
+          console.log(this)
           this.dialogIsOpen = false
           if (filenames === undefined) return
           let path = filenames[0]
@@ -325,6 +326,9 @@ let vueApp = new Vue({
       }).on('unlinkDir', function (path) {
         Files.removeFromTree(path, self.files)
       }).on('change', function (path) {
+        console.log('self.files')
+        console.log(self.files)
+        console.log(`path = ${path}`)
         if (Files.find(self.files, path).open === true) {
           if (self.justSaved) {
             self.justSaved = false
@@ -362,70 +366,88 @@ let vueApp = new Vue({
       this.justSaved = true
     },
 
-    saveAs: function (event) {
-      // capture the filename selected by the user
-      let file = event.target.files[0].path
+    saveAs: function () {
+      if (!this.dialogIsOpen) {
+        this.dialogIsOpen = true
+        dialog.showSaveDialog({
+          title: 'Save'
+        }, (filename) => {
+          console.log(filename)
+          console.log(this)
+          this.dialogIsOpen = false
+          if (filename === undefined) return
 
-      if (this.temp) {
-        // mode specific action
-        this.modeFunction('saveAs', file)
-        // menu.updateRecentFiles(this, this.projectPath)
-      } else {
-        // save a file
-        // if the we are saving inside the project path just open the new file
-        // otherwise open a new window
-        fs.writeFileSync(file, this.currentFile.contents, 'utf8')
-        if ((Path.dirname(file) + '/').indexOf(this.projectPath + '/') > -1) {
-          let f = Files.setup(file)
-          Files.addToTree(f, this.files, this.projectPath)
-          this.openFile(file)
-        } else {
-          this.openProject(file)
-        }
+          if (this.temp) {
+            // mode specific action
+            this.modeFunction('saveAs', filename)
+            // menu.updateRecentFiles(this, this.projectPath)
+          } else {
+            // save a file
+            // if the we are saving inside the project path just open the new file
+            // otherwise open a new window
+            fs.writeFileSync(filename, this.currentFile.contents, 'utf8')
+            if ((Path.dirname(filename) + '/').indexOf(this.projectPath + '/') > -1) {
+              let f = Files.setup(filename)
+              Files.addToTree(f, this.files, this.projectPath)
+              this.openFile(filename)
+            } else {
+              this.openProject(filename)
+            }
+          }
+        })
       }
-
-      // reset value in case the user wants to save the same filename more than once
-      $('#saveFile').val('')
     },
 
-    saveProjectAs: function (event) {
-      let path = event.target.files[0].path
-      let self = this
-      fs.exists(path, function (existing) {
-        if (existing) {
-          rimdir(path, function (error) {
-            if (error) throw error
-            self.modeFunction('saveAs', path)
+    saveProjectAs: function () {
+      if (!this.dialogIsOpen) {
+        this.dialogIsOpen = true
+        dialog.showSaveDialog({
+          title: 'Save'
+        }, (filename) => {
+          console.log(filename)
+          console.log(this)
+          this.dialogIsOpen = false
+          if (filename === undefined) return
+
+          const path = filename
+          const self = this
+          fs.exists(path, function (existing) {
+            if (existing) {
+              rimdir(path, function (error) {
+                if (error) throw error
+                self.modeFunction('saveAs', path)
+              })
+            } else {
+              self.modeFunction('saveAs', path)
+            }
           })
-        } else {
-          self.modeFunction('saveAs', path)
-        }
-      })
+        })
+      }
     },
 
     saveFile: function () {
       // if this is a new project then trigger a save-as
       if (this.temp) {
-        $('#saveFile').trigger('click')
+        this.saveAs()
       } else {
         // otherwise just write the current file
         this.writeFile()
       }
     },
 
-    saveFileAs: function (path) {
-      let originalName = Path.basename(path)
-      let newName = prompt('Save file as:', originalName)
-      if (!newName || newName === originalName) return false
+    // saveFileAs: function (path) {
+    //   let originalName = Path.basename(path)
+    //   let newName = prompt('Save file as:', originalName)
+    //   if (!newName || newName === originalName) return false
 
-      let self = this
-      let filename = Path.join(Path.dirname(path), newName)
-      fs.writeFile(filename, this.currentFile.contents, 'utf8', function (err) {
-        if (err) throw err
-        Files.setup(filename)
-        self.openFile(filename)
-      })
-    },
+    //   let self = this
+    //   let filename = Path.join(Path.dirname(path), newName)
+    //   fs.writeFile(filename, this.currentFile.contents, 'utf8', function (err) {
+    //     if (err) throw err
+    //     Files.setup(filename)
+    //     self.openFile(filename)
+    //   })
+    // },
 
     writeFile: function () {
       let self = this
