@@ -565,6 +565,10 @@ let vueApp = new Vue({
   }
 })
 
+ipcRenderer.on('winClose', () => {
+
+})
+
 ipcRenderer.on('winFocused', () => {
   vueApp.resetMenu()
 })

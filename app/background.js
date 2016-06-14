@@ -36,6 +36,13 @@ const debugInjectJSURL = Path.join(__dirname, 'static', 'debug-console.js')
 function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
 
+  win.on('close', (event) => {
+    const eWin = event.sender
+    if (eWin.outputWinId) {
+      window.windows[eWin.outputWinId].close()
+    }
+  })
+
   win.on('focus', (event) => {
     event.sender.send('winFocused')
   })
