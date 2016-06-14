@@ -339,9 +339,10 @@ module.exports.setup = function (app) {
   template.splice(1, 0, editMenu)
 
   menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
+  // Menu.setApplicationMenu(menu)
+  remote.getCurrentWindow().setMenu(menu)
 }
 
-module.exports.resetMenu = () => {
-  Menu.setApplicationMenu(menu)
-}
+// module.exports.resetMenu = () => {
+//   Menu.setApplicationMenu(menu)
+// }

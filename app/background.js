@@ -59,6 +59,7 @@ function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadA
 
 function createOutputWindow (url, parentWinId, winSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
+  win.setMenu(null)
   window.windows[parentWinId].outputWinId = win.id
   console.log(`window.windows[parentWinId].outputWinId = ${window.windows[parentWinId].outputWinId}`)
   win.parentWinId = parentWinId

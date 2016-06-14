@@ -602,7 +602,7 @@ ipcRenderer.on('winClose', () => {
 })
 
 ipcRenderer.on('winFocused', () => {
-  vueApp.resetMenu()
+  // vueApp.resetMenu()
 })
 
 ipcRenderer.on('outputWinClose', (event, winBounds) => {
@@ -617,7 +617,7 @@ ipcRenderer.on('outputWinClose', (event, winBounds) => {
 
 ipcRenderer.on('outputWinFocused', () => {
   console.log('Output win focused ipc event received')
-  vueApp.resetMenu()
+  // vueApp.resetMenu()
 })
 
 ipcRenderer.on('outputWinResized', () => {
