@@ -34,6 +34,7 @@ const debugInjectJSURL = Path.join(__dirname, 'static', 'debug-console.js')
 
 function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
+  win.outputWinId = null
 
   win.on('close', (event) => {
     const eWin = event.sender

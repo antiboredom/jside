@@ -114,29 +114,35 @@ module.exports = {
   run: function () {
     var self = this
     self.saveAll()
-    // gui.App.clearCache()
-    remote.getCurrentWindow().webContents.session.clearCache(function () {
-      if (self.outputWindow) {
-        if ((String(self.settings.runInBrowser) === 'true')) {
-          shell.openExternal(url)
-        } else {
-          self.outputWindow.reloadIgnoringCache()
-          if (isWin | isLinux) {
-            self.outputWindow.hide()
-            self.outputWindow.show()
-          }
-        }
+    const outputWinId = remote.getCurrentWindow().outputWinId
+    if (outputWinId !== null) {
+      // The output window is open
+      if ((String(self.settings.runInBrowser) === 'true')) {
+        // The user opened an output window then changed settings to run in browser
+        shell.openExternal(url)
       } else {
+        // Output window's already open so just reload it to update sketch
+        remote.BrowserWindow.fromId(outputWinId).webContents.reloadIgnoringCache()
+      }
+    } else {
+      // Output window isn't open so we're not running. First clear the cache
+      remote.getCurrentWindow().webContents.session.clearCache(function () {
+        // Start the static server to host the sketch
         startServer(self.projectPath, self, function (url) {
           if ((String(self.settings.runInBrowser) === 'true')) {
+            // Open the sketch in an external browser
             shell.openExternal(url)
           } else {
+            // User wants an outputWindow so we create it!
             fs.readFile(Path.join(self.projectPath, 'sketch.js'), function (err, data) {
               if (err) throw err
+
+              // Use regex to get canvas width and height if the user coded it otherwise default
               var matches = ('' + data).match(/createCanvas\((.*),(.*)\)/)
               canvasWidth = matches && matches[1] ? +matches[1] : 400
               canvasHeight = matches && matches[2] ? +matches[2] : 400
 
+              // If output win width and height not set, set them equal to the canvas settings
               if (!self.outW) self.outW = canvasWidth
               if (!self.outH) self.outH = canvasHeight
 
@@ -145,7 +151,6 @@ module.exports = {
                 self.outH = canvasHeight
               }
 
-              self.outputWindow = true
               self.newOutputWindow(url, {
                 x: self.outX,
                 y: self.outY,
@@ -159,8 +164,8 @@ module.exports = {
           }
           self.running = true
         })
-      }
-    })
+      })
+    }
   },
 
   stop: function () {
@@ -168,9 +173,9 @@ module.exports = {
     //   p5serial.stop()
     //   nodeGlobal.serialRunning = false
     // }
-    if (this.outputWindow) {
-      let outputWinId = remote.getCurrentWindow().outputWinId
-      console.log(`output win id=${outputWinId}`)
+    let outputWinId = remote.getCurrentWindow().outputWinId
+    console.log(`output win id=${outputWinId}`)
+    if (outputWinId !== null) {
       remote.BrowserWindow.fromId(outputWinId).close()
     } else {
       this.running = false

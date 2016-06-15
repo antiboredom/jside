@@ -342,9 +342,10 @@ let vueApp = new Vue({
 
     // close the window, checking for unsaved file changes
     closeProject: function () {
+      const outputWinId = remote.getCurrentWindow().outputWinId
       if (this.focused) {
-        if (this.outputWindow) {
-          this.outputWindow.close()
+        if (outputWinId !== null) {
+          remote.BrowserWindow.fromId(outputWinId).close()
         }
         remote.getCurrentWindow.close()
       } else {
@@ -612,7 +613,6 @@ ipcRenderer.on('outputWinClose', (event, winBounds) => {
   vueApp.outW = winBounds.width
   vueApp.outH = winBounds.height
   vueApp.running = false
-  vueApp.outputWindow = false
 })
 
 ipcRenderer.on('outputWinFocused', () => {
