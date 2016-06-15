@@ -303,8 +303,17 @@ module.exports.setup = function (app) {
     ]
   }
 
-  const template = []
+  makeMenu()
+  // Menu.setApplicationMenu(menu)
+  remote.getCurrentWindow().setMenu(menu)
+}
 
+// module.exports.resetMenu = () => {
+//   Menu.setApplicationMenu(menu)
+// }
+
+function makeMenu () {
+  const template = []
   if (isMac) {
     template.push(...[
       appMenu,
@@ -321,13 +330,7 @@ module.exports.setup = function (app) {
   template.splice(1, 0, editMenu)
 
   menu = Menu.buildFromTemplate(template)
-  // Menu.setApplicationMenu(menu)
-  remote.getCurrentWindow().setMenu(menu)
 }
-
-// module.exports.resetMenu = () => {
-//   Menu.setApplicationMenu(menu)
-// }
 
 function makeExampleCategorySubMenu (app) {
   // create submenu
