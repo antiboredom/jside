@@ -13,13 +13,20 @@ let isMac = remote.getGlobal('sharedObj').isMac
 
 let menu
 
+let appMenu
+let windowMenu
+let fileMenu
+let editMenu
+let viewMenu
+let helpMenu
+
 const fs = require('fs')
 
 module.exports.setup = function (app) {
   const appName = remote.app.getName()
 
   // Template for 'app' menu found on OSX
-  let appMenu = {
+  appMenu = {
     label: appName,
     submenu: [
       {
@@ -63,7 +70,7 @@ module.exports.setup = function (app) {
   }
 
   // Template for window menu commonly found on OSX
-  let windowMenu = {
+  windowMenu = {
     label: 'Window',
     role: 'window',
     submenu: [
@@ -87,7 +94,7 @@ module.exports.setup = function (app) {
     ]
   }
 
-  let fileMenu = {
+  fileMenu = {
     label: 'File',
     submenu: [
       {
@@ -159,7 +166,7 @@ module.exports.setup = function (app) {
     }
   })
 
-  let editMenu = {
+  editMenu = {
     label: 'Edit',
     submenu: [
       {
@@ -226,7 +233,7 @@ module.exports.setup = function (app) {
     ]
   }
 
-  let viewMenu = {
+  viewMenu = {
     label: 'View',
     submenu: [
       {
@@ -283,7 +290,7 @@ module.exports.setup = function (app) {
     ]
   }
 
-  let helpMenu = {
+  helpMenu = {
     label: 'Help',
     submenu: [
       {
