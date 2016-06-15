@@ -138,7 +138,8 @@ module.exports = {
               if (err) throw err
 
               // Use regex to get canvas width and height if the user coded it otherwise default
-              var matches = ('' + data).match(/createCanvas\((.*),(.*)\)/)
+              // var matches = ('' + data).match(/createCanvas\((.*),(.*)\)/)
+              var matches = ('' + data).match(/createCanvas\(\s*(\d*)\s*,\s*(\d*)\s*(?:,.+)?\s*\)/)
               canvasWidth = matches && matches[1] ? +matches[1] : 400
               canvasHeight = matches && matches[2] ? +matches[2] : 400
 
