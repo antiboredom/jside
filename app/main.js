@@ -115,11 +115,11 @@ let vueApp = new Vue({
         // remote.getCurrentWindow().show()
       })
 
-      // menu.updateRecentFiles(this, this.projectPath)
+      menu.updateRecentFiles(this, this.projectPath)
     } else {
       // if we don't have a project path global, create a new project
       this.modeFunction('newProject')
-      // menu.updateRecentFiles(this)
+      menu.updateRecentFiles(this)
     }
     let win = remote.getCurrentWindow()
     win.setMinimumSize(400, 400)
@@ -363,7 +363,7 @@ let vueApp = new Vue({
           file.lastSavedContents = file.contents
         }
       })
-      // menu.updateRecentFiles(this, this.projectPath)
+      menu.updateRecentFiles(this, this.projectPath)
       this.justSaved = true
     },
 
@@ -381,7 +381,7 @@ let vueApp = new Vue({
           if (this.temp) {
             // mode specific action
             this.modeFunction('saveAs', filename)
-            // menu.updateRecentFiles(this, this.projectPath)
+            menu.updateRecentFiles(this, this.projectPath)
           } else {
             // save a file
             // if the we are saving inside the project path just open the new file

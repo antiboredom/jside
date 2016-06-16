@@ -7,6 +7,7 @@ const {remote} = require('electron')
 const ipcRenderer = require('electron').ipcRenderer
 const shell = require('electron').shell
 const {Menu} = remote
+import storage from 'electron-json-storage'
 
 let nodeGlobal = remote.getGlobal('sharedObj')
 let isMac = nodeGlobal.isMac
@@ -20,6 +21,7 @@ let editMenu
 let viewMenu
 let helpMenu
 let serialMenu
+let openRecent
 
 const fs = require('fs')
 
@@ -122,6 +124,10 @@ module.exports.setup = function (app) {
       }
     ]
   }
+
+  openRecent = { label: 'Open Recent' }
+  // module.exports.updateRecentFiles(app)
+  fileMenu.submenu.push(openRecent)
 
   fileMenu.submenu.push(...[
     {
@@ -322,6 +328,7 @@ module.exports.setup = function (app) {
   // Make the serial menu with the correct menu item (i.e. start serial server or stop serial server)
   makeMenu()
   // Menu.setApplicationMenu(menu)
+  module.exports.updateRecentFiles()
   remote.getCurrentWindow().setMenu(menu)
 }
 
@@ -336,6 +343,58 @@ module.exports.resetMenu = () => {
 
   // Set this window's menu to the updated menu
   remote.getCurrentWindow().setMenu(menu)
+}
+
+module.exports.addRecentFile = () => {
+
+}
+
+module.exports.updateRecentFiles = (app, path) => {
+  storage.get('recentFiles', (error, data) => {
+    if (error) throw error
+    let recentFiles = _.isEmpty(data) ? [] : data.paths
+
+    if (path !== undefined && !app.temp) {
+      // Add new path to the beginning of the recentFiles array
+      recentFiles.unshift(path)
+    }
+
+    // Get rid of duplicates
+    recentFiles = _.unique(recentFiles)
+
+    if (recentFiles.length > 10) recentFiles.pop()
+
+    storage.set('recentFiles', {paths: recentFiles}, (error, data) => {
+      if (error) throw error
+      let openRecentSubMenu = []
+      recentFiles.forEach((p) => {
+        openRecentSubMenu.push({
+          label: Path.basename(p),
+          click () { app.openProject(p) }
+        })
+      })
+
+      // Create a clear recent projects menu item
+      if (recentFiles.length > 0) {
+        openRecentSubMenu.push(
+          { type: 'separator' },
+          {
+            label: 'Clear Recent Projects',
+            click () {
+              storage.remove('recentFiles', () => {
+                // Update the menu
+                module.exports.updateRecentFiles(app)
+              })
+            }
+          }
+        )
+      }
+
+      openRecent.submenu = openRecentSubMenu
+      openRecent.enabled = (openRecentSubMenu.length !== 0)
+      module.exports.resetMenu()
+    })
+  })
 }
 
 function makeMenu () {
