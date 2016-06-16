@@ -1,16 +1,13 @@
-const Path = require('path')
-const $ = require('jquery')
-const _ = require('underscore')
-const Files = require('./files')
+import Path from 'path'
+import _ from 'underscore'
+import Files from './files'
 
-const {remote} = require('electron')
-const ipcRenderer = require('electron').ipcRenderer
-const shell = require('electron').shell
-const {Menu} = remote
+import {app, Menu} from 'electron'
+import window from 'electron-window'
 import storage from 'electron-json-storage'
+import p5serial from 'p5.serialserver'
 
-let nodeGlobal = remote.getGlobal('sharedObj')
-let isMac = nodeGlobal.isMac
+let nodeGlobal
 
 let menu
 
@@ -25,8 +22,17 @@ let openRecent
 
 const fs = require('fs')
 
-module.exports.setup = function (app) {
-  const appName = remote.app.getName()
+function callOnVueApp (bw, expression) {
+  bw.webContents.executeJavaScript(`window.vueApp.${expression};`)
+}
+
+// Setup takes two parameters. The nodeGlobal object from background.js which is
+// actually global.sharedObj. And cb which is the callback for when the menu has
+// been created. Annoyingly need the callback due to asynchronous use of electron
+// json storage
+module.exports.setup = (nG, cb) => {
+  nodeGlobal = nG
+  const appName = app.getName()
 
   // Template for 'app' menu found on OSX
   appMenu = {
@@ -85,7 +91,9 @@ module.exports.setup = function (app) {
       {
         label: 'Close',
         accelerator: 'CmdOrCtrl+W',
-        role: 'close'
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, 'closeProject()')
+        }
       },
       {
         type: 'separator'
@@ -104,29 +112,29 @@ module.exports.setup = function (app) {
         label: 'New Project',
         accelerator: 'CmdOrCtrl+Shift+N',
         click (item, focusedWindow) {
-          app.newWindow(app.windowURL)
+          callOnVueApp(focusedWindow, 'newWindow(vueApp.windowURL)')
         }
       },
       {
         label: 'New File',
         accelerator: 'CmdOrCtrl+N',
         click (item, focusedWindow) {
-          app.newFile()
+          callOnVueApp(focusedWindow, 'newFile()')
         }
       },
       {
         label: 'Open',
         accelerator: 'CmdOrCtrl+O',
         click (item, focusedWindow) {
-          // $('#openFile').trigger('click')
-          app.open()
+          callOnVueApp(focusedWindow, 'open()')
         }
       }
     ]
   }
 
   openRecent = { label: 'Open Recent' }
-  // module.exports.updateRecentFiles(app)
+
+  // Element 3 in fileMenu.submenu
   fileMenu.submenu.push(openRecent)
 
   fileMenu.submenu.push(...[
@@ -134,32 +142,32 @@ module.exports.setup = function (app) {
       label: 'Close',
       accelerator: 'CmdOrCtrl+W',
       click (item, focusedWindow) {
-        app.closeProject()
+        callOnVueApp(focusedWindow, 'closeProject()')
       }
     },
     {
       label: 'Save',
       accelerator: 'CmdOrCtrl+S',
       click (item, focusedWindow) {
-        app.saveFile()
+        callOnVueApp(focusedWindow, 'saveFile()')
       }
     },
     {
       label: 'Save As...',
       accelerator: 'CmdOrCtrl+Shift+S',
       click (item, focusedWindow) {
-        app.saveProjectAs()
+        callOnVueApp(focusedWindow, 'saveProjectAs()')
       }
     }
   ])
 
   // add menu option for loading example sketches
   let examplesMenu = {label: 'Examples'}
-  examplesMenu.submenu = makeExampleCategorySubMenu(app)
+  examplesMenu.submenu = makeExampleCategorySubMenu()
   fileMenu.submenu.push(examplesMenu)
 
   let importLibsMenu = { label: 'Import Library' }
-  importLibsMenu.submenu = makeImportLibsSubMenu(app)
+  importLibsMenu.submenu = makeImportLibsSubMenu()
   fileMenu.submenu.push(importLibsMenu)
 
   fileMenu.submenu.push({type: 'separator'})
@@ -168,7 +176,7 @@ module.exports.setup = function (app) {
     label: 'Run',
     accelerator: 'CmdOrCtrl+R',
     click (item, focusedWindow) {
-      app.run()
+      callOnVueApp(focusedWindow, 'run()')
     }
   })
 
@@ -178,15 +186,15 @@ module.exports.setup = function (app) {
       {
         label: 'Undo',
         accelerator: 'CmdOrCtrl+Z',
-        click () {
-          app.$refs.editor.ace.execCommand('undo')
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('undo')")
         }
       },
       {
         label: 'Redo',
         accelerator: 'Shift+CmdOrCtrl+Z',
-        click () {
-          app.$refs.editor.ace.execCommand('redo')
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('redo')")
         }
       },
       {
@@ -210,8 +218,8 @@ module.exports.setup = function (app) {
       {
         label: 'Delete',
         accelerator: 'CmdOrCtrl+D',
-        click () {
-          app.$refs.editor.ace.execCommand('del')
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('del')")
         }
       },
       {
@@ -225,15 +233,15 @@ module.exports.setup = function (app) {
       {
         label: 'Find',
         accelerator: 'CmdOrCtrl+F',
-        click () {
-          app.$refs.editor.ace.execCommand('find')
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('find')")
         }
       },
       {
         label: 'Find and Replace',
         accelerator: 'CmdOrCtrl+Alt+F',
-        click () {
-          app.$refs.editor.ace.execCommand('replace')
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('replace')")
         }
       }
     ]
@@ -246,7 +254,7 @@ module.exports.setup = function (app) {
         label: 'Show Sketch Folder',
         accelerator: 'CmdOrCtrl+K',
         click (item, focusedWindow) {
-          shell.showItemInFolder(app.projectPath)
+          callOnVueApp(focusedWindow, 'showSketchFolder()')
         }
       },
       {
@@ -256,7 +264,7 @@ module.exports.setup = function (app) {
         label: 'Reformat',
         accelerator: 'CmdOrCtrl+T',
         click (item, focusedWindow) {
-          app.$refs.editor.reformat()
+          callOnVueApp(focusedWindow, '$refs.editor.reformat()')
         }
       },
       {
@@ -266,14 +274,14 @@ module.exports.setup = function (app) {
         label: 'Toggle Settings Panel',
         accelerator: 'CmdOrCtrl+,',
         click (item, focusedWindow) {
-          app.toggleSettingsPane()
+          callOnVueApp(focusedWindow, 'toggleSettingsPane()')
         }
       },
       {
         label: 'Toggle Sidebar',
         accelerator: 'CmdOrCtrl+.',
         click (item, focusedWindow) {
-          app.toggleSidebar()
+          callOnVueApp(focusedWindow, 'toggleSidebar()')
         }
       },
       {
@@ -282,15 +290,15 @@ module.exports.setup = function (app) {
       {
         label: 'Increase Font Size',
         accelerator: 'CmdOrCtrl+=',
-        click () {
-          app.changeFontSize(1)
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, 'changeFontSize(1)')
         }
       },
       {
         label: 'Decrease Font Size',
         accelerator: 'CmdOrCtrl+-',
-        click () {
-          app.changeFontSize(-1)
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, 'changeFontSize(-1)')
         }
       }
     ]
@@ -303,9 +311,19 @@ module.exports.setup = function (app) {
         label: getSerialMenuItemLabel(),
         click () {
           if (!nodeGlobal.serialRunning) {
-            ipcRenderer.send('startSerialServer')
+            p5serial.start()
+            nodeGlobal.serialRunning = true
+
+            // update the serial menu item label
+            serialMenu.submenu[0].label = getSerialMenuItemLabel()
+            resetMenu()
           } else {
-            ipcRenderer.send('stopSerialServer')
+            p5serial.stop()
+            nodeGlobal.serialRunning = false
+
+            // update the serial menu item label
+            serialMenu.submenu[0].label = getSerialMenuItemLabel()
+            resetMenu()
           }
         }
       }
@@ -319,42 +337,42 @@ module.exports.setup = function (app) {
         label: 'Reference',
         role: 'help',
         click (item, focusedWindow) {
-          app.showHelp()
+          callOnVueApp(focusedWindow, 'showHelp()')
         }
       }
     ]
   }
 
-  // Make the serial menu with the correct menu item (i.e. start serial server or stop serial server)
-  makeMenu()
-  // Menu.setApplicationMenu(menu)
-  module.exports.updateRecentFiles()
-  remote.getCurrentWindow().setMenu(menu)
+  module.exports.updateRecentFiles(null, null, () => {
+    // Make the menu from the template objects
+    makeMenu()
+
+    // Set the application's menu (every window's) default menu to be this menu
+    Menu.setApplicationMenu(menu)
+
+    cb()
+  })
 }
 
-module.exports.resetMenu = () => {
-  // update the serial menu item label
-  serialMenu.submenu[0].label = getSerialMenuItemLabel()
-
+function resetMenu () {
   // Remake the menu again from the template objects.
   // Side note: As far as I can see, Electron does not allow dynamic updating
   // of an already created menu object so have to re-create
   makeMenu()
 
-  // Set this window's menu to the updated menu
-  remote.getCurrentWindow().setMenu(menu)
+  // Set all editor windows' menus to the menu object
+  Object.keys(window.windows).forEach(function (key) {
+    const win = window.windows[key]
+    if (win._isEditorWindow) win.setMenu(menu)
+  })
 }
 
-module.exports.addRecentFile = () => {
-
-}
-
-module.exports.updateRecentFiles = (app, path) => {
+module.exports.updateRecentFiles = (isVueAppTemp, path, cb = resetMenu) => {
   storage.get('recentFiles', (error, data) => {
     if (error) throw error
     let recentFiles = _.isEmpty(data) ? [] : data.paths
 
-    if (path !== undefined && !app.temp) {
+    if (path !== undefined && path !== null && !isVueAppTemp) {
       // Add new path to the beginning of the recentFiles array
       recentFiles.unshift(path)
     }
@@ -370,7 +388,9 @@ module.exports.updateRecentFiles = (app, path) => {
       recentFiles.forEach((p) => {
         openRecentSubMenu.push({
           label: Path.basename(p),
-          click () { app.openProject(p) }
+          click (item, focusedWindow) {
+            focusedWindow.webContents.send('openProject', p)
+          }
         })
       })
 
@@ -382,8 +402,8 @@ module.exports.updateRecentFiles = (app, path) => {
             label: 'Clear Recent Projects',
             click () {
               storage.remove('recentFiles', () => {
-                // Update the menu
-                module.exports.updateRecentFiles(app)
+                // Update the menu with the cleared submenu
+                module.exports.updateRecentFiles()
               })
             }
           }
@@ -392,14 +412,19 @@ module.exports.updateRecentFiles = (app, path) => {
 
       openRecent.submenu = openRecentSubMenu
       openRecent.enabled = (openRecentSubMenu.length !== 0)
-      module.exports.resetMenu()
+
+      // Set the javascript object to our modified openRecent template item
+      fileMenu.submenu[3] = openRecent
+
+      // Yay we're finished so call the callback the user gave us or defaults to resetMenu
+      cb()
     })
   })
 }
 
 function makeMenu () {
   const template = []
-  if (isMac) {
+  if (nodeGlobal.isMac) {
     template.push(...[
       appMenu,
       windowMenu
@@ -424,7 +449,7 @@ function getSerialMenuItemLabel () {
   return label
 }
 
-function makeExampleCategorySubMenu (app) {
+function makeExampleCategorySubMenu () {
   // create submenu
   let exampleDir = Path.join('static', 'mode_assets', 'p5', 'examples')
 
@@ -444,7 +469,7 @@ function makeExampleCategorySubMenu (app) {
           {
             label: Files.cleanExampleName(fileName),
             click (item, focusedWindow) {
-              app.modeFunction('launchExample', exampleDir.concat('/').concat(category).concat('/').concat(fileName))
+              focusedWindow.webContents.send('launchExample', exampleDir.concat('/').concat(category).concat('/').concat(fileName))
             }
           }
         )
@@ -456,14 +481,14 @@ function makeExampleCategorySubMenu (app) {
   return exampleCategorySubMenu
 }
 
-function makeImportLibsSubMenu (app) {
+function makeImportLibsSubMenu () {
   let importLibsSubMenu = []
   let libFiles = fs.readdirSync(Path.join('static', 'mode_assets', 'p5', 'libraries'))
   libFiles.forEach(function (lib) {
     importLibsSubMenu.push({
       label: Path.basename(lib),
-      click: () => {
-        app.modeFunction('addLibrary', lib)
+      click: (item, focusedWindow) => {
+        focusedWindow.webContents.send('addLibrary', lib)
       }
     })
   })

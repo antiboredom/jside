@@ -9,7 +9,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 import keybindings from './keybindings'
 import Files from './files'
-import menu from './menu'
 // import windowstate from './windowstate'
 // import updater from './updater'
 import settings from './settings'
@@ -30,7 +29,7 @@ require('./Window')
 // import App from './App'
 
 /* eslint-disable no-new */
-let vueApp = new Vue({
+window.vueApp = new Vue({
   el: '#app',
 
   mode: modes.p5,
@@ -79,7 +78,6 @@ let vueApp = new Vue({
   ready: function () {
     // updater.check()
     keybindings.setup(this)
-    menu.setup(this)
 
     this.setupFileListener()
     this.setupCloseHandler()
@@ -115,11 +113,10 @@ let vueApp = new Vue({
         // remote.getCurrentWindow().show()
       })
 
-      menu.updateRecentFiles(this, this.projectPath)
+      updateRecentFiles(this.temp, this.projectPath)
     } else {
       // if we don't have a project path global, create a new project
       this.modeFunction('newProject')
-      menu.updateRecentFiles(this)
     }
     let win = remote.getCurrentWindow()
     win.setMinimumSize(400, 400)
@@ -298,10 +295,6 @@ let vueApp = new Vue({
       })
     },
 
-    resetMenu: function () {
-      menu.resetMenu()
-    },
-
     // watch the project file tree for changes
     watch: function (path) {
       let self = this
@@ -363,7 +356,7 @@ let vueApp = new Vue({
           file.lastSavedContents = file.contents
         }
       })
-      menu.updateRecentFiles(this, this.projectPath)
+      updateRecentFiles(this.temp, this.projectPath)
       this.justSaved = true
     },
 
@@ -381,7 +374,7 @@ let vueApp = new Vue({
           if (this.temp) {
             // mode specific action
             this.modeFunction('saveAs', filename)
-            menu.updateRecentFiles(this, this.projectPath)
+            updateRecentFiles(this.temp, this.projectPath)
           } else {
             // save a file
             // if the we are saving inside the project path just open the new file
@@ -593,23 +586,29 @@ let vueApp = new Vue({
     showHelp: function () {
       // gui.Shell.openExternal(this.$options.mode.referenceURL)
       shell.openExternal(this.$options.mode.referenceURL)
+    },
+
+    showSketchFolder: function () {
+      shell.showItemInFolder(this.projectPath)
     }
 
   }
 })
+
+// console.log(vueApp)
+
+function updateRecentFiles (isVueAppTemp, path) {
+  ipcRenderer.send('updateRecentFiles', isVueAppTemp, path)
+}
 
 // Subscribe to IPC messages from the main process
 ipcRenderer.on('winClose', () => {
 
 })
 
-ipcRenderer.on('updateMenu', () => {
-  // console.log('Recieved updateMenu IPC call from main process')
-  vueApp.resetMenu()
-})
-
 ipcRenderer.on('outputWinClose', (event, winBounds) => {
   // console.log('Output win close ipc event received')
+  const vueApp = window.vueApp
   vueApp.outX = winBounds.x
   vueApp.outY = winBounds.y
   vueApp.outW = winBounds.width
@@ -619,5 +618,21 @@ ipcRenderer.on('outputWinClose', (event, winBounds) => {
 
 ipcRenderer.on('outputWinResized', () => {
   console.log('Output win resized ipc event received')
+  const vueApp = window.vueApp
   vueApp.resizedOutputWindow = true
+})
+
+ipcRenderer.on('openProject', (event, path) => {
+  const vueApp = window.vueApp
+  vueApp.openProject(path)
+})
+
+ipcRenderer.on('launchExample', (event, path) => {
+  const vueApp = window.vueApp
+  vueApp.modeFunction('launchExample', path)
+})
+
+ipcRenderer.on('addLibrary', (event, lib) => {
+  const vueApp = window.vueApp
+  vueApp.modeFunction('addLibrary', lib)
 })

@@ -5,8 +5,8 @@
 
 import { app, ipcMain } from 'electron'
 import Path from 'path'
-const window = require('electron-window')
-const p5serial = require('p5.serialserver')
+import window from 'electron-window'
+import menu from './menu'
 // import fs from 'fs'
 
 var defaultWinSettings = {
@@ -35,6 +35,9 @@ const debugInjectJSURL = Path.join(__dirname, 'static', 'debug-console.js')
 
 function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
+  win._isEditorWindow = true
+  win.vueApp = null
+
   win.outputWinId = null
 
   win.on('close', (event) => {
@@ -99,28 +102,14 @@ ipcMain.on('createOutputWindow', (event, url, settings, preloadArgs) => {
   createOutputWindow(url, parentWinId, settings, preloadArgs)
 })
 
-ipcMain.on('startSerialServer', () => {
-  // console.log('Recieved START serial server IPC call')
-  p5serial.start()
-  global.sharedObj.serialRunning = true
-
-  Object.keys(window.windows).forEach(function (key) {
-    window.windows[key].webContents.send('updateMenu')
-  })
-})
-
-ipcMain.on('stopSerialServer', () => {
-  // console.log('Recieved STOP serial server IPC call')
-  p5serial.stop()
-  global.sharedObj.serialRunning = false
-
-  Object.keys(window.windows).forEach(function (key) {
-    window.windows[key].webContents.send('updateMenu')
-  })
+ipcMain.on('updateRecentFiles', (event, isVueAppTemp, path) => {
+  menu.updateRecentFiles(isVueAppTemp, path)
 })
 
 app.on('ready', () => {
-  createWindow()
+  menu.setup(global.sharedObj, () => {
+    createWindow()
+  })
 })
 
 app.on('window-all-closed', () => {
