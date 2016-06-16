@@ -23,7 +23,13 @@ let isWin = process.platform === 'win32'
 let isMac = process.platform === 'darwin'
 let isLinux = process.platform === 'linux'
 
-global.sharedObj = {isWin: isWin, isMac: isMac, isLinux: isLinux, serialRunning: false}
+global.sharedObj = {
+  isWin: isWin,
+  isMac: isMac,
+  isLinux: isLinux,
+  serialRunning: false,
+  checkedUpdate: false
+}
 
 // Load the HTML file directly from the webpack dev server if
 // hot reload is enabled, otherwise load the local file.
@@ -113,5 +119,6 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
+  console.log('Calling app quit')
   app.quit()
 })

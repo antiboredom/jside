@@ -183,43 +183,43 @@ module.exports = {
     }
   },
 
-  update: function (callback) {
-    var url = 'https://api.github.com/repos/processing/p5.js/releases/latest'
-    var libraryPath = Path.join('static', 'mode_assets', 'p5', 'empty_project', 'libraries')
-    var fileNames = ['p5.js', 'p5.dom.js', 'p5.sound.js']
+  // update: function (callback) {
+  //   var url = 'https://api.github.com/repos/processing/p5.js/releases/latest'
+  //   var libraryPath = Path.join('static', 'mode_assets', 'p5', 'empty_project', 'libraries')
+  //   var fileNames = ['p5.js', 'p5.dom.js', 'p5.sound.js']
 
-    request({url: url, headers: {'User-Agent': 'request'}}, function (error, response, data) {
-      if (error) return
+  //   request({url: url, headers: {'User-Agent': 'request'}}, function (error, response, data) {
+  //     if (error) return
 
-      // filter assets to only include the filenames we want
-      var assets = JSON.parse(data).assets.filter(function (asset) {
-        return fileNames.indexOf(asset.name) > -1
-      })
+  //     // filter assets to only include the filenames we want
+  //     var assets = JSON.parse(data).assets.filter(function (asset) {
+  //       return fileNames.indexOf(asset.name) > -1
+  //     })
 
-      // if remoteVersion != localVersion, download new version of each asset
-      var remoteVersion = JSON.parse(data).tag_name
-      var localPathToP5 = Path.join(libraryPath, 'p5.js')
+  //     // if remoteVersion != localVersion, download new version of each asset
+  //     var remoteVersion = JSON.parse(data).tag_name
+  //     var localPathToP5 = Path.join(libraryPath, 'p5.js')
 
-      var localVersionTag = getVersion(localPathToP5, function (localVersion) {
-        if (remoteVersion !== localVersion || !localVersion) {
-          assets.forEach(function (asset) {
-            var localPathToAsset = Path.join(libraryPath, asset.name)
-            downloadAsset(asset.browser_download_url, localPathToAsset)
-          })
-        }
-      })
-    })
+  //     var localVersionTag = getVersion(localPathToP5, function (localVersion) {
+  //       if (remoteVersion !== localVersion || !localVersion) {
+  //         assets.forEach(function (asset) {
+  //           var localPathToAsset = Path.join(libraryPath, asset.name)
+  //           downloadAsset(asset.browser_download_url, localPathToAsset)
+  //         })
+  //       }
+  //     })
+  //   })
 
-    function downloadAsset (remote, local) {
-      request({url: remote, headers: {'User-Agent': 'request'}}, function (error, response, body) {
-        if (error) return
+  //   function downloadAsset (remote, local) {
+  //     request({url: remote, headers: {'User-Agent': 'request'}}, function (error, response, body) {
+  //       if (error) return
 
-        if (body.split('\n')[0].indexOf('/*! p5.') > -1) {
-          fs.writeFile(local, body)
-        }
-      })
-    }
-  },
+  //       if (body.split('\n')[0].indexOf('/*! p5.') > -1) {
+  //         fs.writeFile(local, body)
+  //       }
+  //     })
+  //   }
+  // },
 
   addLibrary: function (path) {
     var basename = Path.basename(path)

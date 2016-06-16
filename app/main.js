@@ -10,7 +10,7 @@ import _ from 'underscore'
 import keybindings from './keybindings'
 import Files from './files'
 // import windowstate from './windowstate'
-// import updater from './updater'
+import updater from './updater'
 import settings from './settings'
 let modes = {
   p5: require('./modes/p5/p5-mode')
@@ -21,12 +21,11 @@ const remote = require('electron').remote
 const dialog = remote.dialog
 const ipcRenderer = require('electron').ipcRenderer
 
-// only call if `preload` is set in `windowOptions`
+// Pasrse any arguments that were sent when creating this BrowserWindow e.g. parentWinId
 require('electron-window').parseArgs()
 
+// Require in the window vue component which has global styles for the app
 require('./Window')
-
-// import App from './App'
 
 /* eslint-disable no-new */
 window.vueApp = new Vue({
@@ -76,10 +75,9 @@ window.vueApp = new Vue({
   },
 
   ready: function () {
-    // updater.check()
+    updater.check()
     keybindings.setup(this)
 
-    this.setupFileListener()
     this.setupCloseHandler()
     this.setupDragListener()
     this.setupSettings()
@@ -147,14 +145,6 @@ window.vueApp = new Vue({
         this.$broadcast('settings-changed', value)
         settings.save(value)
       })
-    },
-
-    // use jquery to handle file changes
-    // (I should move this over to vuejs but it wasn't dealing
-    // with the html file element properly)
-    setupFileListener: function () {
-      // $('#saveFile').change(this.saveAs.bind(this))
-      // $('#saveProject').change(this.saveProjectAs.bind(this))
     },
 
     setupCloseHandler: function () {
