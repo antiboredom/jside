@@ -75,8 +75,11 @@ module.exports = {
       'clipboard',
       'crash-reporter',
       'screen',
-      'shell'
-    ])
+      'shell',
+      'p5.serialserver'
+    ]),
+    new webpack.IgnorePlugin(/vertx/),
+    new webpack.ContextReplacementPlugin(/bindings$/, /^$/)
   ],
   vue: {
     loaders: cssLoaders()

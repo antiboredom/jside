@@ -6,6 +6,7 @@
 import { app, ipcMain } from 'electron'
 import Path from 'path'
 const window = require('electron-window')
+const p5serial = require('p5.serialserver')
 // import fs from 'fs'
 
 var defaultWinSettings = {
@@ -22,7 +23,7 @@ let isWin = process.platform === 'win32'
 let isMac = process.platform === 'darwin'
 let isLinux = process.platform === 'linux'
 
-global.sharedObj = {isWin: isWin, isMac: isMac, isLinux: isLinux}
+global.sharedObj = {isWin: isWin, isMac: isMac, isLinux: isLinux, serialRunning: false}
 
 // Load the HTML file directly from the webpack dev server if
 // hot reload is enabled, otherwise load the local file.
@@ -41,10 +42,6 @@ function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadA
     if (eWin.outputWinId) {
       window.windows[eWin.outputWinId].close()
     }
-  })
-
-  win.on('focus', (event) => {
-    event.sender.send('winFocused')
   })
 
   if (preloadArgs) {
@@ -67,24 +64,12 @@ function createOutputWindow (url, parentWinId, winSettings, preloadArgs) {
   // console.log(`new output window id = ${win.id}`)
 
   win.on('close', (event) => {
-    // console.log(event.sender.id)
     const outputWindow = event.sender
     const parentWinId = outputWindow.parentWinId
-    // console.log('Output window\'s bounds:')
-    // console.log(outputWindow.getBounds())
     const outWinBounds = outputWindow.getBounds()
     window.windows[parentWinId].outputWinId = null
     window.windows[parentWinId].webContents.send('outputWinClose', outWinBounds)
-
-    // console.log(`Closed output window's parent win id=${parentWinId}`)
   })
-
-  // win.on('focus', (event) => {
-  //   const outputWindow = event.sender
-  //   const parentWinId = outputWindow.parentWinId
-  //   const parentWindow = window.windows[parentWinId]
-  //   parentWindow.webContents.send('outputWinFocused')
-  // })
 
   win.on('resize', (event) => {
     const outputWindow = event.sender
@@ -98,7 +83,6 @@ function createOutputWindow (url, parentWinId, winSettings, preloadArgs) {
   } else {
     win.showURL(url)
   }
-
   // console.log(`Length of windows array after creating window ${Object.keys(window.windows).length}`)
 }
 
@@ -113,6 +97,26 @@ ipcMain.on('createOutputWindow', (event, url, settings, preloadArgs) => {
   }
   settings.webPreferences.preload = debugInjectJSURL
   createOutputWindow(url, parentWinId, settings, preloadArgs)
+})
+
+ipcMain.on('startSerialServer', () => {
+  // console.log('Recieved START serial server IPC call')
+  p5serial.start()
+  global.sharedObj.serialRunning = true
+
+  Object.keys(window.windows).forEach(function (key) {
+    window.windows[key].webContents.send('updateMenu')
+  })
+})
+
+ipcMain.on('stopSerialServer', () => {
+  // console.log('Recieved STOP serial server IPC call')
+  p5serial.stop()
+  global.sharedObj.serialRunning = false
+
+  Object.keys(window.windows).forEach(function (key) {
+    window.windows[key].webContents.send('updateMenu')
+  })
 })
 
 app.on('ready', () => {

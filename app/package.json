@@ -13,11 +13,9 @@
     "jquery": "2.2.2",
     "js-beautify": "~1.5.1",
     "node-static": "0.7.6",
-    "p5.serialserver": "git://github.com/davejm/p5.serialport.git#master",
     "portscanner": "1.0.0",
     "rimraf": "^2.3.4",
     "semver": "~3.0.1",
-    "serialport": "3.1.2",
     "trash": "~0.1.2",
     "underscore": "~1.6.0",
     "wrench": "~1.5.8"

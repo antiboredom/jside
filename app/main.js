@@ -598,26 +598,23 @@ let vueApp = new Vue({
   }
 })
 
+// Subscribe to IPC messages from the main process
 ipcRenderer.on('winClose', () => {
 
 })
 
-ipcRenderer.on('winFocused', () => {
-  // vueApp.resetMenu()
+ipcRenderer.on('updateMenu', () => {
+  // console.log('Recieved updateMenu IPC call from main process')
+  vueApp.resetMenu()
 })
 
 ipcRenderer.on('outputWinClose', (event, winBounds) => {
-  console.log('Output win close ipc event received')
+  // console.log('Output win close ipc event received')
   vueApp.outX = winBounds.x
   vueApp.outY = winBounds.y
   vueApp.outW = winBounds.width
   vueApp.outH = winBounds.height
   vueApp.running = false
-})
-
-ipcRenderer.on('outputWinFocused', () => {
-  console.log('Output win focused ipc event received')
-  // vueApp.resetMenu()
 })
 
 ipcRenderer.on('outputWinResized', () => {

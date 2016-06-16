@@ -4,12 +4,12 @@ const _ = require('underscore')
 const Files = require('./files')
 
 const {remote} = require('electron')
+const ipcRenderer = require('electron').ipcRenderer
 const shell = require('electron').shell
 const {Menu} = remote
 
-let isWin = remote.getGlobal('sharedObj').isWin
-let isLinux = remote.getGlobal('sharedObj').isLinux
-let isMac = remote.getGlobal('sharedObj').isMac
+let nodeGlobal = remote.getGlobal('sharedObj')
+let isMac = nodeGlobal.isMac
 
 let menu
 
@@ -19,6 +19,7 @@ let fileMenu
 let editMenu
 let viewMenu
 let helpMenu
+let serialMenu
 
 const fs = require('fs')
 
@@ -151,7 +152,6 @@ module.exports.setup = function (app) {
   examplesMenu.submenu = makeExampleCategorySubMenu(app)
   fileMenu.submenu.push(examplesMenu)
 
-  // Control the serial server
   let importLibsMenu = { label: 'Import Library' }
   importLibsMenu.submenu = makeImportLibsSubMenu(app)
   fileMenu.submenu.push(importLibsMenu)
@@ -290,6 +290,22 @@ module.exports.setup = function (app) {
     ]
   }
 
+  serialMenu = {
+    label: 'Serial',
+    submenu: [
+      {
+        label: getSerialMenuItemLabel(),
+        click () {
+          if (!nodeGlobal.serialRunning) {
+            ipcRenderer.send('startSerialServer')
+          } else {
+            ipcRenderer.send('stopSerialServer')
+          }
+        }
+      }
+    ]
+  }
+
   helpMenu = {
     label: 'Help',
     submenu: [
@@ -303,14 +319,24 @@ module.exports.setup = function (app) {
     ]
   }
 
+  // Make the serial menu with the correct menu item (i.e. start serial server or stop serial server)
   makeMenu()
   // Menu.setApplicationMenu(menu)
   remote.getCurrentWindow().setMenu(menu)
 }
 
-// module.exports.resetMenu = () => {
-//   Menu.setApplicationMenu(menu)
-// }
+module.exports.resetMenu = () => {
+  // update the serial menu item label
+  serialMenu.submenu[0].label = getSerialMenuItemLabel()
+
+  // Remake the menu again from the template objects.
+  // Side note: As far as I can see, Electron does not allow dynamic updating
+  // of an already created menu object so have to re-create
+  makeMenu()
+
+  // Set this window's menu to the updated menu
+  remote.getCurrentWindow().setMenu(menu)
+}
 
 function makeMenu () {
   const template = []
@@ -324,12 +350,19 @@ function makeMenu () {
   template.push(...[
     fileMenu,
     viewMenu,
+    serialMenu,
     helpMenu
   ])
 
   template.splice(1, 0, editMenu)
 
   menu = Menu.buildFromTemplate(template)
+}
+
+function getSerialMenuItemLabel () {
+  const label = nodeGlobal.serialRunning ? 'Stop Serial Server' : 'Start Serial Server'
+  // console.log(`Serial menu item label: ${label}`)
+  return label
 }
 
 function makeExampleCategorySubMenu (app) {
