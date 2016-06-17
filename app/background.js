@@ -118,6 +118,9 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
-  console.log('Calling app quit')
-  app.quit()
+  // OSX typical behaviour is to simply close a window and not actually quit until explicitly told to
+  if (!isMac) {
+    console.log('Calling app quit')
+    app.quit()
+  }
 })
