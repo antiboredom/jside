@@ -13,7 +13,8 @@ var defaultWinSettings = {
   x: 50,
   y: 50,
   width: 1024,
-  height: 768
+  height: 768,
+  show: true
 }
 
 // console.log(`platform is ${process.platform}`)

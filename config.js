@@ -22,7 +22,9 @@ module.exports = {
     assetsSubDirectory: 'assets',
 
     // Whether to generate source maps for production builds.
-    productionSourceMap: true
+    productionSourceMap: true,
+
+    iconFile: path.resolve(__dirname, 'build', 'resources', 'p5js')
   },
   release: {
     // The Electron version to use for packaged releases. If blank, it defaults

@@ -12,6 +12,9 @@ import Files from './files'
 // import windowstate from './windowstate'
 import updater from './updater'
 import settings from './settings'
+
+import App from './App'
+
 let modes = {
   p5: require('./modes/p5/p5-mode')
 }
@@ -24,22 +27,13 @@ const ipcRenderer = require('electron').ipcRenderer
 // Pasrse any arguments that were sent when creating this BrowserWindow e.g. parentWinId
 require('electron-window').parseArgs()
 
-// Require in the window vue component which has global styles for the app
-require('./Window')
-
 /* eslint-disable no-new */
 window.vueApp = new Vue({
-  el: '#app',
+  el: 'html',
 
   mode: modes.p5,
 
-  components: {
-    editor: require('./components/Editor'),
-    sidebar: require('./components/Sidebar'),
-    settings: require('./components/Settings'),
-    debug: require('./components/Debug'),
-    tabs: require('./components/Tabs')
-  },
+  components: { App },
 
   data: {
     title: 'Untitled',

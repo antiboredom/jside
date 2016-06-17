@@ -34,7 +34,8 @@ var packagerConfig = {
   overwrite: true,
   ignore: Object.keys((appManifest.devDependencies || {})).map(function (name) {
     return '/node_modules/' + name + '($|/)'
-  })
+  }),
+  icon: config.build.iconFile
 }
 
 packager(packagerConfig, function (err, appPath) {
