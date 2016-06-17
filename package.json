@@ -26,7 +26,7 @@
     "partialify": "^3.1.1",
     "request": "^2.56.0",
     "underscore": "~1.6.0",
-    "vue": "^0.10.3"
+    "vue": "^1.0.24"
   },
   "scripts": {
     "app": "nw public"

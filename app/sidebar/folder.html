@@ -1,7 +1,9 @@
-<div class="item folder" v-show="!hidden" v-on="click: toggleFolder(this), contextmenu: popupMenu(this, $event)">
-  <span class="toggle {{ open ? 'open' : 'closed'}}"></span>
-  {{name}}
+<div class="item folder" @click="toggleFolder" @contextmenu="popupMenu(this, $event)">
+  <span class="toggle" :class="[open ? 'open' : 'closed']"></span>
+  {{item.name}}
 </div>
 <ul v-show="open">
-  <li v-repeat="children | orderBy 'name'" v-component="{{type}}"></li>
+  <li v-for="child in item.children | orderBy 'name'">
+    <component :is="child.type" :item="child"></component>
+  </li>
 </ul>

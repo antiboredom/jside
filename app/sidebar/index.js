@@ -1,86 +1,125 @@
 var Path = nodeRequire('path');
 var fs = nodeRequire('fs');
 var trash = nodeRequire('trash');
+var Vue = require('vue');
 
 var File = require('./../files');
 var _ = require('underscore');
 var $ = require('jquery');
 
-module.exports = {
-  template: require('./sidebar.html'),
+Vue.component('file', {
+  name: 'File',
+  template: require('./file.html'),
+  props: {
+    item: {
+      required: true
+    }
+  },
+  computed: {
+    hidden: function() {
+      return this.item.name[0] === '.';
+    },
+    icon: function() {
+      if (this.item.ext.match(/(png|jpg|gif|svg|jpeg)$/i)) return 'image';
+      else if (this.item.ext.match(/db$/i)) return 'db';
+      else return 'file';
+    },
+    className: function() {
+      return this.$root.currentFile.path === this.item.path ? 'selected' : '';
+    }
+  },
 
-  data: {
-    sidebarWidth: undefined
+  methods: {
+    popupMenu: function(target, event) {
+      popupMenu.apply(this, arguments);
+    },
+    openFile: function() {
+      this.$root.openFile(this.item.path)
+    }
+  }
+});
+
+Vue.component('folder', {
+  name: 'Folder',
+  template: require('./folder.html'),
+  props: {
+    item: {
+      required: true
+    }
+  },
+  data: function() {
+    return {
+      open: false,
+      icon: 'folder'
+    };
+  },
+  methods: {
+    popupMenu: function(target, event) {
+      popupMenu.apply(this, arguments);
+    },
+    toggleFolder: function() {
+      this.open = !this.open;
+      var self = this;
+      if (this.open) {
+        File.list(this.item.path, function(files) {
+          var childrenIds = _.map(self.children, _.property('id'));
+          var newFiles = _.filter(files, function(file) { return !_.contains(childrenIds, file.id); });
+          self.item.children = self.item.children.concat(newFiles);
+          if (!this.item.watching) {
+            self.item.watching = true;
+            self.$root.watch(self.path);
+          }
+          if (typeof cb === 'function') cb();
+        });
+      }
+    }
+  }
+});
+
+module.exports = {
+  name: 'Sidebar',
+  template: require('./sidebar.html'),
+  props: ['files'],
+
+  data: function() {
+    return {
+      sidebarWidth: 0,
+      containerWidth: 0
+    };
   },
 
   computed: {
     className: function() {
-      var container = $('#sidebar-container');
-      if (String(this.$root.settings.showSidebar) === "true") { // ask sam
+      return String(this.$root.settings.showSidebar) === "true" ? "expanded" : "";
+    }
+  },
+
+  watch: {
+    className: function(value) {
+      const container = $('#sidebar-container');
+      if (value === "expanded") {
         $('#showSidebarLabel').html( $('#showSidebarLabel').data('hide') );
         container.css({
           width: this.sidebarWidth
         });
-        ace.resize();
-        return "expanded";
       } else {
         $('#showSidebarLabel').html( $('#showSidebarLabel').data('show') );
         this.sidebarWidth = container.width();
         container.css({
           width: 10
         });
-        ace.resize();
-        return "";
       }
+      ace.resize();
     }
   },
 
-  ready: function() {
-    this.$on('open-nested-file', this.openNestedFile);
-    var container = $('#sidebar-container');
-    this.sidebarWidth = container.width();
+  events: {
+    'open-nested-file': 'openNestedFile'
   },
 
-  components: {
-
-    file: {
-      template: require('./file.html'),
-      computed: {
-        hidden: function() {
-          return this.name[0] === '.';
-        },
-        icon: function() {
-          if (this.ext.match(/(png|jpg|gif|svg|jpeg)$/i)) return 'image';
-          else if (this.ext.match(/db$/i)) return 'db';
-          else return 'file';
-        },
-        className: function() {
-          var c = 'item';
-          if (this.$root.currentFile.path == this.path) c += ' selected';
-          return c;
-        }
-      },
-
-      methods: {
-        popupMenu: function(target, event) {
-          popupMenu.apply(this, arguments);
-        }
-      }
-    },
-
-    folder: {
-      template: require('./folder.html'),
-      data: {
-        open: false,
-        icon: 'folder'
-      },
-      computed: {},
-      methods: {
-        popupMenu: function(target, event) {
-          popupMenu.apply(this, arguments);
-        }
-      }
-    },
+  ready: function() {
+    var container = $('#sidebar-container');
+    this.sidebarWidth = container.width();
   },
 
   methods: {
@@ -91,24 +130,6 @@ module.exports = {
     openFile: function(file) {
       this.$root.openFile(file.path);
     },
-
-    toggleFolder: function(folder, cb) {
-      var self = this;
-      folder.open = !folder.open;
-      if (folder.open) {
-        File.list(folder.path, function(files) {
-          var childrenIds = _.map(folder.children, _.property('id'));
-          var newFiles = _.filter(files, function(file) { return !_.contains(childrenIds, file.id); });
-          folder.children = folder.children.concat(newFiles);
-          if (!folder.watching) {
-            folder.watching = true;
-            self.$root.watch(folder.path);
-          }
-          if (typeof cb === 'function') cb();
-        });
-      }
-    },
-
 
     openNestedFile: function(path) {
       var self = this;

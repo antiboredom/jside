@@ -4,12 +4,14 @@ var Path = nodeRequire('path');
 var fs = nodeRequire('fs');
 
 module.exports = {
-
+  name: 'Debug',
   template: require('./template.html'),
 
-  data: {
-    orientation: undefined,
-    debugWidth: undefined
+  data: function() {
+    return {
+      orientation: undefined,
+      debugWidth: undefined
+    };
   },
 
   methods: {

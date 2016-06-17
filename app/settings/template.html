@@ -1,19 +1,19 @@
 <div id="settingsPane">
   <div id="titleBar">
     <p>Preferences</p>
-    <img id="close" class="button" src="images/close-button.svg" v-on="click: $root.toggleSettingsPane()">
+    <img id="close" class="button" src="images/close-button.svg" @click="$root.toggleSettingsPane()">
   </div>
   <div id="optionsZone">
     <!-- Text size -->
     <div class="section">
       <p class="label">Text size</p>
       <span class="adjustButtonContainer">
-        <img class="adjustButton button" src="images/minus-button.svg" v-on="click: decreaseFontSize">
+        <img class="adjustButton button" src="images/minus-button.svg" @click="decreaseFontSize">
         <label>Decrease</label>
       </span>
-      <input id="textAdjustInput" type="text" v-model="fontSize" size=3>
+      <input id="textAdjustInput" type="text" v-model="fontSize" number size=3>
       <span class="adjustButtonContainer">
-        <img class="adjustButton button" src="images/plus-button.svg" v-on="click: increaseFontSize">
+        <img class="adjustButton button" src="images/plus-button.svg" @click="increaseFontSize">
         <label>Increase</label>
       </span>
     </div>
@@ -22,12 +22,12 @@
     <div id="indentation" class="section">
       <p class="label">Indentation amount</p>
       <span class="adjustButtonContainer">
-        <img class="adjustButton button" src="images/minus-button.svg" v-on="click: decreaseTabSize">
+        <img class="adjustButton button" src="images/minus-button.svg" @click="decreaseTabSize">
         <label>Decrease</label>
       </span>
-      <input id="tabSize" type="text"  v-model="tabSizeDisplay" size=3 v-on="change: updateTabSize">
+      <input id="tabSize" type="text"  v-model="tabSize" number size=3 @change="updateTabSize">
       <span class="adjustButtonContainer">
-        <img class="adjustButton button" src="images/plus-button.svg" v-on="click: increaseTabSize">
+        <img class="adjustButton button" src="images/plus-button.svg" @click="increaseTabSize">
         <label>Increase</label>
       </span>
 
@@ -71,7 +71,7 @@
       </label>
 
       <input type="radio" name="consoleOrientation" id="consoleV" v-model="consoleOrientation" value="vertical" >
-      <label for="consoleV" class="right">  
+      <label for="consoleV" class="right">
         <img id="browserIcon" src="images/consoleV.svg">
       </label>
     </div>
