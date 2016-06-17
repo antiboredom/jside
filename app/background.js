@@ -42,7 +42,6 @@ const debugInjectJSURL = Path.join(__dirname, 'static', 'debug-console.js')
 function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
   win._isEditorWindow = true
-  win.vueApp = null
 
   win.outputWinId = null
 
