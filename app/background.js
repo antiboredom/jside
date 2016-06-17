@@ -13,8 +13,12 @@ var defaultWinSettings = {
   x: 50,
   y: 50,
   width: 1024,
-  height: 768,
-  show: true
+  height: 768
+}
+
+// Hack to make vue devtools work
+if (process.env.NODE_ENV !== 'production') {
+  defaultWinSettings.show = true
 }
 
 // console.log(`platform is ${process.platform}`)
