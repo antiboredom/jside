@@ -1,5 +1,7 @@
 ## Overview:
 
+I'm pretty sure this will require Node Version 4+. Tested on Node V6
+
 Based off the electron-boilerplate-vue template at https://github.com/bradstewart/electron-boilerplate-vue. I forked from the p5.js editor repo, merged this PR https://github.com/processing/p5.js-editor/pull/239 into my branch, deleted pretty much everything and started from scratch building things up to get features working on electron.
 
 I'd say it's almost there but there are some issues. There are some features that I haven't completed yet that I am aware of and some bugs that may exist that I am not aware of but I think a lot of the changes fix current open issues.
