@@ -33,6 +33,7 @@ function callOnVueApp (bw, expression) {
 module.exports.setup = (nG, cb) => {
   nodeGlobal = nG
   const appName = app.getName()
+  const editorRef = '$children[0].$refs.editor'
 
   // Template for 'app' menu found on OSX
   appMenu = {
@@ -187,14 +188,14 @@ module.exports.setup = (nG, cb) => {
         label: 'Undo',
         accelerator: 'CmdOrCtrl+Z',
         click (item, focusedWindow) {
-          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('undo')")
+          callOnVueApp(focusedWindow, `${editorRef}.ace.execCommand('undo')`)
         }
       },
       {
         label: 'Redo',
         accelerator: 'Shift+CmdOrCtrl+Z',
         click (item, focusedWindow) {
-          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('redo')")
+          callOnVueApp(focusedWindow, `${editorRef}.ace.execCommand('redo')`)
         }
       },
       {
@@ -219,7 +220,7 @@ module.exports.setup = (nG, cb) => {
         label: 'Delete',
         accelerator: 'CmdOrCtrl+D',
         click (item, focusedWindow) {
-          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('del')")
+          callOnVueApp(focusedWindow, `${editorRef}.ace.execCommand('del')`)
         }
       },
       {
@@ -234,14 +235,14 @@ module.exports.setup = (nG, cb) => {
         label: 'Find',
         accelerator: 'CmdOrCtrl+F',
         click (item, focusedWindow) {
-          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('find')")
+          callOnVueApp(focusedWindow, `${editorRef}.ace.execCommand('find')`)
         }
       },
       {
         label: 'Find and Replace',
         accelerator: 'CmdOrCtrl+Alt+F',
         click (item, focusedWindow) {
-          callOnVueApp(focusedWindow, "$refs.editor.ace.execCommand('replace')")
+          callOnVueApp(focusedWindow, `${editorRef}.ace.execCommand('replace')`)
         }
       }
     ]
@@ -264,7 +265,7 @@ module.exports.setup = (nG, cb) => {
         label: 'Reformat',
         accelerator: 'CmdOrCtrl+T',
         click (item, focusedWindow) {
-          callOnVueApp(focusedWindow, '$refs.editor.reformat()')
+          callOnVueApp(focusedWindow, `${editorRef}.reformat()`)
         }
       },
       {

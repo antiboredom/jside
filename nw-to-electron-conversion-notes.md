@@ -34,7 +34,6 @@ I tried to stick to the same logic as much as possible from the original nw.js b
 - Close handler for editor - check about files still open etc.
 - Handle errors better (done a lot of 'if (err) throw err')
 - Make sure releases and packages work as expected - make sure to get icons
-- Fix references to the ACE editor in VUE components
 - Check for instances of prompt() and replace with a working function as Electron 'Will never support prompt()'
 - Serial controlling - DONE - fixed webpack issues. Although currently have to manually remove "('bindings')" from require app/node_modules/serialport/lib/bindings.js.
 - Lingering node process after app.quit(). Strangely doesn't seem to occur if ctrl+c to end. This casuses an EADDRINUSE error when trying to run the webpack dev server again. Just `killall node` and try again.
