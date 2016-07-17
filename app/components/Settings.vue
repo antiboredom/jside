@@ -109,21 +109,21 @@
     ],
 
     methods: {
-      updateTabSize: function(e) {
+      updateTabSize: function (e) {
         var parsed = typeof e === 'number' ? e : parseInt(e.target.value)
         this.tabSize = parsed >= 1 ? parsed : 1
         // ace.getSession().setTabSize(this.tabSize) // TODO get ace ref
       },
-      decreaseTabSize: function(e) {
-        this.updateTabSize(this.tabSize-1)
+      decreaseTabSize: function (e) {
+        this.updateTabSize(this.tabSize - 1)
       },
-      increaseTabSize: function(e) {
-        this.updateTabSize(this.tabSize+1)
+      increaseTabSize: function (e) {
+        this.updateTabSize(this.tabSize + 1)
       },
-      decreaseFontSize: function(e) {
+      decreaseFontSize: function (e) {
         this.fontSize--
       },
-      increaseFontSize: function(e) {
+      increaseFontSize: function (e) {
         this.fontSize++
       }
     }

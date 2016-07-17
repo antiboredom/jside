@@ -147,13 +147,13 @@
     height: 44px;
     font-size: 25px;
     display: inline;
-    outline: 0; 
+    outline: 0;
     float: left;
 
     &.running {
       background-image: url('assets/images/stop-button.svg');
     }
-  }  
+  }
 
   #settings {
     width: 44px;
@@ -166,7 +166,7 @@
     color: #b5b5b5;
     margin-top: 14px;
     margin-bottom: 10px;
-    cursor: default; 
+    cursor: default;
     float:left;
   }
 
@@ -177,7 +177,6 @@
   }
 
   #actions {
-    
     #add, #export {
       float: left;
     }
@@ -187,6 +186,4 @@
       margin-right: 15px;
     }
   }
-
-
 </style>

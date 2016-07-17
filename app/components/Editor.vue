@@ -8,8 +8,8 @@
   var _ = require('underscore')
   var Files = require('../files')
   var beautify = require('js-beautify').js_beautify
-  var beautify_css = require('js-beautify').css
-  var beautify_html = require('js-beautify').html
+  var beautifyCss = require('js-beautify').css
+  var beautifyHtml = require('js-beautify').html
   var ace = require('brace')
 
   require('brace/mode/html')
@@ -21,18 +21,18 @@
   require('brace/ext/searchbox')
 
   var modes = {
-    ".html": "html",
-    ".htm": "html",
-    ".js": "javascript",
-    ".css": "css",
-    ".json": "json",
-    ".txt": "text"
+    '.html': 'html',
+    '.htm': 'html',
+    '.js': 'javascript',
+    '.css': 'css',
+    '.json': 'json',
+    '.txt': 'text'
   }
 
   module.exports = {
     name: 'Editor',
 
-    data: function() {
+    data: function () {
       return {
         newProject: true
       }
@@ -46,11 +46,11 @@
       'settings-changed': 'updateSettings'
     },
 
-    ready: function() {
+    ready: function () {
       this.sessions = []
 
       this.ace = window.ace = ace.edit(this.$els.editor)
-      //this.ace.setTheme('ace/theme/tomorrow')
+      // this.ace.setTheme('ace/theme/tomorrow')
       this.ace.setReadOnly(true)
       // this.ace.$worker.send("changeOptions", [{asi: false}])
 
@@ -58,18 +58,18 @@
     },
 
     methods: {
-      openFile: function(fileObject) {
-        var session = _.findWhere(this.sessions, {path: fileObject.path})
+      openFile: function (fileObject) {
+        let session = _.findWhere(this.sessions, {path: fileObject.path})
         if (!session) {
-          var doc = ace.createEditSession(fileObject.contents, "ace/mode/" + modes[fileObject.ext])
+          var doc = ace.createEditSession(fileObject.contents, 'ace/mode/' + modes[fileObject.ext])
 
           var self = this
-          doc.on('change', function() {
+          doc.on('change', function () {
             var file = Files.find(self.$root.files, fileObject.path)
             if (file) file.contents = doc.getValue()
           })
 
-          var session = {
+          session = {
             path: fileObject.path,
             doc: doc
           }
@@ -88,75 +88,74 @@
         }
       },
 
-      closeFile: function(fileObject){
+      closeFile: function (fileObject) {
         var session = _.findWhere(this.sessions, {path: fileObject.path})
-        if(session){
+        if (session) {
           var index = _.indexOf(this.sessions, session)
-          this.sessions.splice(index,1)
+          this.sessions.splice(index, 1)
         }
       },
 
-      saveProjectAs: function(path) {
-        this.sessions.forEach(function(session) {
+      saveProjectAs: function (path) {
+        this.sessions.forEach(function (session) {
           session.path = Path.join(path, Path.basename(session.path))
         })
       },
 
-      reformat: function() {
+      reformat: function () {
         var ext = this.$root.currentFile.ext
         var content = this.ace.getValue()
         var opts = {
-          "indent_size": this.$root.settings.tabSize,
-          "indent_with_tabs": this.$root.settings.tabType === 'tabs',
+          'indent_size': this.$root.settings.tabSize,
+          'indent_with_tabs': this.$root.settings.tabType === 'tabs'
         }
 
         var pos = this.ace.getCursorPosition()
         var scrollPos = this.ace.getSession().getScrollTop()
 
-        if (ext == '.js') {
+        if (ext === '.js') {
           this.ace.setValue(beautify(content, opts), -1)
-        } else if (ext == '.css') {
-          this.ace.setValue(beautify_css(content, opts), -1)
-        } else if (ext == '.html') {
-          this.ace.setValue(beautify_html(content, opts), -1)
+        } else if (ext === '.css') {
+          this.ace.setValue(beautifyCss(content, opts), -1)
+        } else if (ext === '.html') {
+          this.ace.setValue(beautifyHtml(content, opts), -1)
         }
 
         this.ace.moveCursorToPosition(pos)
         this.ace.getSession().setScrollTop(scrollPos)
       },
 
-      updateSettings: function(settings) {
+      updateSettings: function (settings) {
         this.ace.getSession().setTabSize(settings.tabSize)
         this.ace.getSession().setUseSoftTabs(settings.tabType === 'spaces')
         this.ace.getSession().setUseWrapMode(settings.wordWrap === true)
       },
 
-      customizeCommands: function() {
+      customizeCommands: function () {
         var self = this
         var commands = [{
-          name: "blockoutdent",
-          bindKey: {win: 'Ctrl-[,',  mac: 'Command-['},
-          exec: function(editor) { editor.blockOutdent(); },
-          multiSelectAction: "forEachLine",
-          scrollIntoView: "selectionPart"
+          name: 'blockoutdent',
+          bindKey: {win: 'Ctrl-[,', mac: 'Command-['},
+          exec: function (editor) { editor.blockOutdent() },
+          multiSelectAction: 'forEachLine',
+          scrollIntoView: 'selectionPart'
         }, {
-          name: "blockindent",
-          bindKey: {win: 'Ctrl-],',  mac: 'Command-]'},
-          exec: function(editor) { editor.blockIndent(); },
-          multiSelectAction: "forEachLine",
-          scrollIntoView: "selectionPart"
+          name: 'blockindent',
+          bindKey: {win: 'Ctrl-],', mac: 'Command-]'},
+          exec: function (editor) { editor.blockIndent() },
+          multiSelectAction: 'forEachLine',
+          scrollIntoView: 'selectionPart'
         }, {
           name: 'Preferences',
-          bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
-          exec: function(editor) {
+          bindKey: {win: 'Ctrl-,', mac: 'Command-,'},
+          exec: function (editor) {
             self.$root.toggleSettingsPane()
           }
         }]
 
-        commands.forEach(function(command){
+        commands.forEach(function (command) {
           self.ace.commands.addCommand(command)
         })
-
       }
 
     }

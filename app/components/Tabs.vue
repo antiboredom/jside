@@ -15,13 +15,7 @@
 </template>
 
 <script>
-  var Path = require('path')
-  var fs = require('fs')
-  var trash = require('trash')
-
-  var File = require('../files')
   var _ = require('underscore')
-  var $ = require('jquery')
 
   export default {
     name: 'Tabs',
@@ -33,13 +27,13 @@
         template: require('./tab.html'),
         props: ['path', 'name', 'file'],
         computed: {
-          hidden: function() {
+          hidden: function () {
             return this.name[0] === '.'
           },
-          editing: function() {
+          editing: function () {
             return this.file.contents !== this.file.lastSavedContents ? '*' : ''
           },
-          selected: function() {
+          selected: function () {
             return this.$root.currentFile === this.file
           }
         }
@@ -47,14 +41,14 @@
     },
 
     methods: {
-      closeFile: function(fileObject) {
+      closeFile: function (fileObject) {
         var tabs = this.$root.tabs
-        var target_tabs = tabs.filter(function(tab) {
+        var targetTabs = tabs.filter(function (tab) {
           return tab.name === fileObject.name
         })
-        if (target_tabs[0]) {
+        if (targetTabs[0]) {
           var newTarget
-          var index = _.indexOf(tabs, target_tabs[0])
+          var index = _.indexOf(tabs, targetTabs[0])
 
           switch (index) {
             case 0:
@@ -67,12 +61,12 @@
               newTarget = index - 1
               break
           }
-            tabs.splice(index, 1)
-            this.$root.openFile(tabs[newTarget].path)
+          tabs.splice(index, 1)
+          this.$root.openFile(tabs[newTarget].path)
         }
       },
 
-      addTab: function(fileObject, tabs) {
+      addTab: function (fileObject, tabs) {
         if (fileObject.open) {
           var tabObject = {
             name: fileObject.name,
