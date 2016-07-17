@@ -8,9 +8,7 @@ var Files = require('../../files')
 const shell = require('electron').shell
 const remote = require('electron').remote
 
-let isWin = remote.getGlobal('sharedObj').isWin
-let isLinux = remote.getGlobal('sharedObj').isLinux
-let isMac = remote.getGlobal('sharedObj').isMac
+const staticDir = remote.getGlobal('sharedObj').staticDir
 
 var canvasWidth
 var canvasHeight
@@ -20,7 +18,7 @@ var prevCanvasHeight
 module.exports = {
   newProject: function () {
     // copy the empty project folder to a temporary directory
-    var emptyProject = Path.join('static', 'mode_assets', 'p5', 'empty_project')
+    var emptyProject = Path.join(staticDir, 'mode_assets', 'p5', 'empty_project')
     var tempProject = Path.join(os.tmpdir(), 'p5' + Date.now(), 'Untitled')
     wrench.mkdirSyncRecursive(tempProject)
     wrench.copyDirSyncRecursive(emptyProject, tempProject, {
@@ -41,7 +39,7 @@ module.exports = {
 
   launchExample: function (examplePath) {
     // copy the empty project folder to a temporary directory
-    var emptyProject = 'static/mode_assets/p5/empty_project'
+    var emptyProject = Path.join(staticDir, 'mode_assets', 'p5', 'empty_project')
     var tempProjectPath = Path.join(os.tmpdir(), 'p5' + Date.now(), Files.cleanExampleName(examplePath))
     wrench.mkdirSyncRecursive(tempProjectPath)
     wrench.copyDirSyncRecursive(emptyProject, tempProjectPath, {
@@ -57,7 +55,7 @@ module.exports = {
       wrench.mkdirSyncRecursive(assetsDir)
       assets.forEach(function (a) {
         a = a.replace(/(assets\/)|['"]/g, '')
-        var originalAsset = Path.join('static/mode_assets/p5/example_assets', a)
+        var originalAsset = Path.join(staticDir, 'mode_assets', 'p5', 'example_assets', a)
         var destAsset = Path.join(assetsDir, a)
         fs.createReadStream(originalAsset).pipe(fs.createWriteStream(destAsset))
       })
@@ -223,7 +221,7 @@ module.exports = {
 
   addLibrary: function (path) {
     var basename = Path.basename(path)
-    var src = Path.join('static', 'mode_assets', 'p5', 'libraries', basename)
+    var src = Path.join(staticDir, 'mode_assets', 'p5', 'libraries', basename)
     var dest = Path.join(this.projectPath, 'libraries', basename)
     fs.createReadStream(src).pipe(fs.createWriteStream(dest))
 

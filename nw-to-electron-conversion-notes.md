@@ -39,6 +39,7 @@ I tried to stick to the same logic as much as possible from the original nw.js b
 - Serial controlling - DONE - dependecy issues with webpack though. Currently put it as a devDependency in the root package.json and externalising via webpack config when it should really be in the app/package.json dependencies I think. I opened an issue here: https://github.com/bradstewart/electron-boilerplate-vue/issues/31
 - Lingering node process after app.quit(). Strangely doesn't seem to occur if ctrl+c to end. This casuses an EADDRINUSE error when trying to run the webpack dev server again. Just `killall node` and try again.
 - Vue hot loading currently doesn't work properly. The whole page reloads. This is an open issue on the electron vue boilerplate project https://github.com/bradstewart/electron-boilerplate-vue/issues/19
+- A way to get the latest p5.js library version and examples. Original nwjs branch had to manually use gulp tasks to do this. I think it would be better to do this within the app? Still up for discussion.
 
 ### Non-essential:
 - Convert callback hell (e.g. menu.js) to promise-style async for readability

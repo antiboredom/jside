@@ -238,8 +238,20 @@ if (typeof JSON.retrocycle !== 'function') {
 
 (function() {
 
-    // parse the args to window (should include parent window id)
-  require('electron-window').parseArgs();
+  // parse the args to window (should include parent window id)
+  // require('electron-window').parseArgs();
+
+  // FIXME: Temporarily include parseArgs func from electron-window package due to webpack problems
+  function parseArgs () {
+    if (!window.location.hash) {
+      window.__args__ = {}
+    } else {
+      var hash = window.location.hash.slice(1)
+      window.__args__ = Object.freeze(JSON.parse(decodeURIComponent(hash)))
+    }
+  }
+  parseArgs();
+
 
   var remote = require('electron').remote;
 
@@ -255,10 +267,6 @@ if (typeof JSON.retrocycle !== 'function') {
     original.log(message)
     let parentWinId = window.__args__.parentWindowId
     let parentWin = remote.BrowserWindow.fromId(parentWinId)
-    // parentWin.webContents.executeJavaScript(`
-    //   window.receievedMessage = \`${message}\`;
-    //   window.receieveDebugMessage();
-    // `)
 
     parentWin.webContents.send('debugMessage', message)
   }

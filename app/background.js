@@ -21,9 +21,7 @@ if (process.env.NODE_ENV !== 'production') {
   defaultWinSettings.show = true
 }
 
-// console.log(`platform is ${process.platform}`)
-
-// platform
+// Platform globals
 let isWin = process.platform === 'win32'
 let isMac = process.platform === 'darwin'
 let isLinux = process.platform === 'linux'
@@ -33,7 +31,8 @@ global.sharedObj = {
   isMac: isMac,
   isLinux: isLinux,
   serialRunning: false,
-  checkedUpdate: false
+  checkedUpdate: false,
+  staticDir: Path.join(__dirname, 'static')
 }
 
 // Load the HTML file directly from the webpack dev server if
@@ -43,6 +42,15 @@ const mainURL = process.env.HOT
   : 'file://' + Path.join(__dirname, 'main.html')
 
 const debugInjectJSURL = Path.join(__dirname, 'static', 'debug-console.js')
+
+// Helper function to remove the file prefix of file URLs for electron-window.
+function cleanUrl (url) {
+  // Remove the file url protocol prefix if it's there as electron-window package doesn't like it
+  url = url.replace('file://', '')
+  // Get rid of any url encoded hash string if one's already on the URL
+  url = url.split('#')[0]
+  return url
+}
 
 function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
@@ -57,24 +65,23 @@ function createWindow (url = mainURL, winSettings = defaultWinSettings, preloadA
     }
   })
 
+  url = cleanUrl(url)
   if (preloadArgs) {
     win.showURL(url, preloadArgs)
   } else {
     win.showURL(url)
   }
 
-  if (process.env.NODE_ENV !== 'production') {
-    win.openDevTools()
-  }
+  // if (process.env.NODE_ENV !== 'production') {
+  win.openDevTools()
+  // }
 }
 
 function createOutputWindow (url, parentWinId, winSettings, preloadArgs) {
   const win = window.createWindow(winSettings)
   win.setMenu(null)
   window.windows[parentWinId].outputWinId = win.id
-  // console.log(`window.windows[parentWinId].outputWinId = ${window.windows[parentWinId].outputWinId}`)
   win.parentWinId = parentWinId
-  // console.log(`new output window id = ${win.id}`)
 
   win.on('close', (event) => {
     const outputWindow = event.sender
@@ -91,12 +98,13 @@ function createOutputWindow (url, parentWinId, winSettings, preloadArgs) {
     parentWindow.webContents.send('outputWinResized')
   })
 
+  url = cleanUrl(url)
   if (preloadArgs) {
     win.showURL(url, preloadArgs)
   } else {
     win.showURL(url)
   }
-  // console.log(`Length of windows array after creating window ${Object.keys(window.windows).length}`)
+  win.openDevTools()
 }
 
 ipcMain.on('createWindow', (event, url, settings, preloadArgs) => {
@@ -125,7 +133,6 @@ app.on('ready', () => {
 app.on('window-all-closed', () => {
   // OSX typical behaviour is to simply close a window and not actually quit until explicitly told to
   if (!isMac) {
-    console.log('Calling app quit')
     app.quit()
   }
 })

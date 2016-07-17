@@ -75,8 +75,7 @@ module.exports = {
       'clipboard',
       'crash-reporter',
       'screen',
-      'shell',
-      'p5.serialserver'
+      'shell'
     ]),
     new webpack.IgnorePlugin(/vertx/),
     new webpack.ContextReplacementPlugin(/bindings$/, /^$/)

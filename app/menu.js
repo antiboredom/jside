@@ -451,7 +451,7 @@ function getSerialMenuItemLabel () {
 
 function makeExampleCategorySubMenu () {
   // create submenu
-  let exampleDir = Path.join('static', 'mode_assets', 'p5', 'examples')
+  let exampleDir = Path.join(__dirname, 'static', 'mode_assets', 'p5', 'examples')
 
   // get latest example categories
   let files = fs.readdirSync(exampleDir)
@@ -483,7 +483,7 @@ function makeExampleCategorySubMenu () {
 
 function makeImportLibsSubMenu () {
   let importLibsSubMenu = []
-  let libFiles = fs.readdirSync(Path.join('static', 'mode_assets', 'p5', 'libraries'))
+  let libFiles = fs.readdirSync(Path.join(__dirname, 'static', 'mode_assets', 'p5', 'libraries'))
   libFiles.forEach(function (lib) {
     importLibsSubMenu.push({
       label: Path.basename(lib),

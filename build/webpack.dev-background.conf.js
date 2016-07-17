@@ -26,7 +26,7 @@ module.exports = merge(webpackBaseConfig, {
   plugins: [
     // Copy files from app to dist
     new CopyWebpackPlugin([
-      { from: './static/debug-console.js', to: './static' },
+      { from: './static', to: 'static' },
       { from: './app/package.json', to: '.' }
     ]),
 

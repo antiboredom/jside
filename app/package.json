@@ -1,7 +1,7 @@
 {
   "name": "p5",
   "productName": "p5.js Editor",
-  "version": "0.5.10",
+  "version": "0.6.0",
   "description": "Javascript IDE for beginners",
   "author": "Sam Lavigne",
   "main": "background.js",
@@ -11,6 +11,7 @@
     "brace": "git+https://gigit@github.com/antiboredom/brace.git",
     "chokidar": "^1.5.2",
     "electron-json-storage": "^2.0.0",
+    "electron-window": "^0.8.1",
     "jquery": "2.2.2",
     "js-beautify": "~1.5.1",
     "node-static": "0.7.6",
@@ -19,6 +20,7 @@
     "semver": "~5.1.0",
     "trash": "~0.1.2",
     "underscore": "~1.6.0",
-    "wrench": "~1.5.8"
+    "wrench": "~1.5.8",
+    "p5.serialserver": "git://github.com/vanevery/p5.serialport.git#master"
   }
 }
