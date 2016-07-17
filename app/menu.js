@@ -226,7 +226,9 @@ module.exports.setup = (nG, cb) => {
       {
         label: 'Select All',
         accelerator: 'CmdOrCtrl+A',
-        role: 'selectall'
+        click (item, focusedWindow) {
+          callOnVueApp(focusedWindow, `${editorRef}.ace.execCommand('selectAll')`)
+        }
       },
       {
         type: 'separator'
