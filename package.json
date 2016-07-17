@@ -67,6 +67,7 @@
     "rimraf": "^2.5.0",
     "sass-loader": "^3.2.0",
     "selenium-server": "2.52.0",
+    "tree-kill": "^1.1.0",
     "url-loader": "^0.5.7",
     "vue": "^1.0.17",
     "vue-hot-reload-api": "^1.2.0",
