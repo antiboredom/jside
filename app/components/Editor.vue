@@ -296,8 +296,7 @@
   }
 
 
-
-  body.horizontal {
+  #main-container.horizontal {
     div#editor-container {
       flex-direction: column;
     }

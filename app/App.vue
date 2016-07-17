@@ -6,7 +6,7 @@
     <script src="static/electron_boilerplate/context_menu.js"></script>
     <script src="static/electron_boilerplate/external_links.js"></script>
   </head>
-  <body :class="[$root.orientation]">
+  <body>
     <div id="header-container">
       <img id="logo" src="./assets/images/p5-logo.png">
       <button class="button" id="play" :class="{'running': $root.running}" @click="$root.toggleRun()"></button>
@@ -21,7 +21,7 @@
       <div id="side-container">
         <sidebar v-ref:sidebar :files="$root.files"></sidebar>
       </div>
-      <div id="main-container">
+      <div :class="[$root.orientation]" id="main-container">
         <tabs v-ref:tabs :tabs="$root.tabs" id="tab-container"></tabs>
         <div id = "editor-container">
           <editor v-ref:editor id="main"></editor>

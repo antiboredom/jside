@@ -29,7 +29,7 @@ I tried to stick to the same logic as much as possible from the original nw.js b
 
 ## Issues I'm aware of / things I haven't implemented back in yet:
 
-- Debug console permanently vertical
+- Debug console bugs when changing from horizontal to vertical
 - Save window state on exit and reopen with state
 - Close handler for editor - check about files still open etc.
 - Handle errors better (done a lot of 'if (err) throw err')

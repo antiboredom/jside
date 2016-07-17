@@ -28,7 +28,7 @@
     methods: {
 
       startDrag: function (e) {
-        if ($('body').hasClass('horizontal')) {
+        if ($('#main-container').hasClass('horizontal')) {
           this.horizonatlDrag(e)
         } else {
           this.verticalDrag(e)
@@ -194,7 +194,7 @@
   }
 
 
-  body.horizontal {
+  #main-container.horizontal {
     #debug-container {
       height: 100px;
       width: auto;
