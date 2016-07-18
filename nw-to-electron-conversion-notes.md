@@ -29,6 +29,8 @@ I tried to stick to the same logic as much as possible from the original nw.js b
 
 ## Issues I'm aware of / things I haven't implemented back in yet:
 
+- New file doesn't work due to prompt() method being unsupported by electron
+- Mac OSX menu bar cannot be updated - affects open recent and start/stop serialserver
 - Debug console bugs when changing from horizontal to vertical
 - Save window state on exit and reopen with state
 - Close handler for editor - check about files still open etc.
