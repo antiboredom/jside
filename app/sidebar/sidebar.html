@@ -1,17 +1,10 @@
-<div id="sidebar">
-  <button id="play" v-class="running: $root.running" v-on="click: $root.toggleRun()"></button>
-  <h1 id="project-name" v-text="projectName"></h1>
-  <div id="filetree">
-    <ul>
-      <li v-repeat="files | orderBy 'name'" v-show="!hidden" v-component="{{type}}"></li>
-    </ul>
-  </div>
-  <div id="toolbar">
-    <div id="actions">
-      <button id="settings" title="Preferences" v-on="click: $root.toggleSettingsPane()">
-        <img src="images/options.svg">
-      </button>
-    </div>
-  </div>
+<div id="sidebar-container" class = "{{className}}"  v-on="contextmenu: popupMenu(this, $event)">
+	<div id="sidebar">
+		<div id="filetree">
+			<ul>
+				<li v-repeat="files | orderBy 'name'" v-component="{{type}}"></li>
+			</ul>
+		</div>
+	</div>
+	<div id="sidebar-drag" v-on="mousedown: startDrag"></div>
 </div>
-<div id="sidebar-drag" v-on="mousedown: startDrag"></div>

@@ -6,9 +6,9 @@ var beautify = require('js-beautify').js_beautify;
 var beautify_css = require('js-beautify').css;
 var beautify_html = require('js-beautify').html;
 var ace = require('brace');
-require('brace/mode/javascript');
+
 require('brace/mode/html');
-require('brace/mode/ejs');
+require('brace/mode/javascript');
 require('brace/mode/css');
 require('brace/mode/json');
 require('brace/mode/text');
@@ -16,8 +16,8 @@ require('brace/theme/tomorrow');
 require('brace/ext/searchbox');
 
 var modes = {
-  ".html": "ejs",
-  ".htm": "ejs",
+  ".html": "html",
+  ".htm": "html",
   ".js": "javascript",
   ".css": "css",
   ".json": "json",
@@ -36,13 +36,15 @@ module.exports = {
     this.sessions = [];
 
     this.$on('open-file', this.openFile);
+    this.$on('close-file', this.closeFile);
     this.$on('save-project-as', this.saveProjectAs);
     this.$on('reformat', this.reformat);
     this.$on('settings-changed', this.updateSettings);
 
     this.ace = window.ace = ace.edit('editor');
-    this.ace.setTheme('ace/theme/tomorrow');
+    //this.ace.setTheme('ace/theme/tomorrow');
     this.ace.setReadOnly(true);
+    // this.ace.$worker.send("changeOptions", [{asi: false}]);
 
     this.customizeCommands();
   },
@@ -50,7 +52,6 @@ module.exports = {
   methods: {
     openFile: function(fileObject) {
       var session = _.findWhere(this.sessions, {path: fileObject.path});
-
       if (!session) {
         var doc = ace.createEditSession(fileObject.contents, "ace/mode/" + modes[fileObject.ext]);
 
@@ -79,6 +80,14 @@ module.exports = {
       }
     },
 
+    closeFile: function(fileObject){
+      var session = _.findWhere(this.sessions, {path: fileObject.path});
+      if(session){
+        var index = _.indexOf(this.sessions, session);
+        this.sessions.splice(index,1);
+      }
+    },
+
     saveProjectAs: function(path) {
       this.sessions.forEach(function(session) {
         session.path = Path.join(path, Path.basename(session.path));
@@ -92,13 +101,20 @@ module.exports = {
         "indent_size": this.$root.settings.tabSize,
         "indent_with_tabs": this.$root.settings.tabType === 'tabs',
       };
+
+      var pos = this.ace.getCursorPosition();
+      var scrollPos = this.ace.getSession().getScrollTop();
+
       if (ext == '.js') {
-        this.ace.setValue(beautify(content, opts));
+        this.ace.setValue(beautify(content, opts), -1);
       } else if (ext == '.css') {
-        this.ace.setValue(beautify_css(content, opts));
+        this.ace.setValue(beautify_css(content, opts), -1);
       } else if (ext == '.html') {
-        this.ace.setValue(beautify_html(content, opts));
+        this.ace.setValue(beautify_html(content, opts), -1);
       }
+
+      this.ace.moveCursorToPosition(pos);
+      this.ace.getSession().setScrollTop(scrollPos);
     },
 
     updateSettings: function(settings) {

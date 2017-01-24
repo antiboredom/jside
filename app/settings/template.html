@@ -1,68 +1,93 @@
 <div id="settingsPane">
   <div id="titleBar">
-    <h2>Preferences</h2><div id="close" v-on="click: $root.toggleSettingsPane()">
-
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="x" x="0" y="0" viewBox="111.98 169.64 388.04 407.06" enable-background="new 111.982048 169.6423035 388.0419922 407.0557861" xml:space="preserve"><path d="M326.08 360.51L392.7 293.88c6.42-6.42 6.42-16.81 0-23.23 -6.42-6.42-16.81-6.42-23.23 0l-66.63 66.63 -66.63-66.63c-6.42-6.42-16.81-6.42-23.23 0s-6.42 16.81 0 23.23l66.63 66.63 -66.63 66.63c-6.42 6.42-6.42 16.81 0 23.23 3.21 3.21 7.41 4.81 11.61 4.81 4.2 0 8.41-1.6 11.61-4.81l66.63-66.63 66.63 66.63c3.21 3.21 7.41 4.81 11.61 4.81 4.2 0 8.41-1.6 11.61-4.81 6.42-6.42 6.42-16.81 0-23.23L326.08 360.51z" ></svg></div>
-
+    <p>Preferences</p>
+    <img id="close" class="button" src="images/close-button.svg" v-on="click: $root.toggleSettingsPane()">
   </div>
   <div id="optionsZone">
-    <div class="hiddenRadio">
-      <p id="consoleText">Console Orientation</p>
+    <!-- Text size -->
+    <div class="section">
+      <p class="label">Text size</p>
+      <span class="adjustButtonContainer">
+        <img class="adjustButton button" src="images/minus-button.svg" v-on="click: decreaseFontSize">
+        <label>Decrease</label>
+      </span>
+      <input id="textAdjustInput" type="text" v-model="fontSize" size=3>
+      <span class="adjustButtonContainer">
+        <img class="adjustButton button" src="images/plus-button.svg" v-on="click: increaseFontSize">
+        <label>Increase</label>
+      </span>
+    </div>
+
+    <!-- Indentation amount -->
+    <div id="indentation" class="section">
+      <p class="label">Indentation amount</p>
+      <span class="adjustButtonContainer">
+        <img class="adjustButton button" src="images/minus-button.svg" v-on="click: decreaseTabSize">
+        <label>Decrease</label>
+      </span>
+      <input id="tabSize" type="text"  v-model="tabSizeDisplay" size=3 v-on="change: updateTabSize">
+      <span class="adjustButtonContainer">
+        <img class="adjustButton button" src="images/plus-button.svg" v-on="click: increaseTabSize">
+        <label>Increase</label>
+      </span>
+
+      <div id="indentOptions" class="hiddenRadio radioOptions">
+        <input type="radio" value="spaces" id="tabTypeS" v-model="tabType">
+        <label class="radioSelection" for="tabTypeS">Spaces</label>
+        <input type="radio" value="tabs" id="tabTypeT" v-model="tabType">
+        <label class="radioSelection" for="tabTypeT">Tabs</label>
+      </div>
+    </div>
+
+    <!-- Word wrap -->
+    <div id="ww" class="section">
+      <p class="label">Word wrap</p>
+      <div id="wwOptions" class="hiddenRadio radioOptions">
+        <input type="radio" value="true" id="wordWrapOn" v-model="wordWrap">
+        <label class="radioSelection" for="wordWrapOn">On</label>
+        <input type="radio" value="false" id="wordWrapOff" v-model="wordWrap">
+        <label class="radioSelection" for="wordWrapOff">Off</label>
+      </div>
+    </div>
+
+    <!-- Run in browser -->
+    <div id="rib" class="section">
+      <p class="label">Run in browser</p>
+      <div id="ribOptions" class="hiddenRadio radioOptions">
+        <input type="radio" value="true" id="runInBrowserOn" v-model="runInBrowser">
+        <label class="radioSelection" for="runInBrowserOn">On</label>
+        <input type="radio" value="false" id="runInBrowserOff" v-model="runInBrowser">
+        <label class="radioSelection" for="runInBrowserOff">Off</label>
+      </div>
+    </div>
+
+    <!-- Console orientation -->
+    <div class="section hiddenRadio">
+      <p id="consoleText" class="label">Console orientation</p>
 
       <input type="radio" name="consoleOrientation" id="consoleH" v-model="consoleOrientation" value="horizontal" >
       <label for="consoleH" class="left">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="console" id="consoleHorizontal" x="0px" y="0px" viewBox="111.982048 169.6423035 388.0419922 220.7826385" xml:space="preserve"><g><path d="M487.5209656 339.6809998H124.4851151c-6.9052582 0-12.5030746-5.5978394-12.5030746-12.5030823V182.145401 c0-6.9052582 5.5978165-12.5030823 12.5030746-12.5030823h363.0358582c6.9052429 0 12.5 5.6 12.5 12.5 v145.0325165C500.0240173 334.1 494.4 339.7 487.5 339.6809998z"/><path d="M111.9820404 377.9217529v-18.2110291c0-6.9052429 5.5978165-12.5030518 12.5030746-12.5030518h363.0358582 c6.9052429 0 12.5 5.6 12.5 12.5030518v18.2110291c0 6.9052734-5.5978088 12.5030823-12.5030518 12.5 H124.4851151C117.5798569 390.4 112 384.8 112 377.9217529z"/></g></svg>
+        <img id="browserIcon" src="images/consoleH.svg">
       </label>
 
       <input type="radio" name="consoleOrientation" id="consoleV" v-model="consoleOrientation" value="vertical" >
-      <label for="consoleV" class="right">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="console" id="consoleVertical" x="0" y="0" viewBox="111.98 169.64 388.04 220.78" enable-background="new 111.982048 169.6423035 388.0419922 220.7826385" xml:space="preserve"><path d="M400.55 390.42H124.49c-6.91 0-12.5-5.6-12.5-12.5V182.15c0-6.91 5.6-12.5 12.5-12.5H400.55c6.91 0 12.5 5.6 12.5 12.5V377.92C413.05 384.83 407.45 390.42 400.55 390.42z"/><path d="M487.52 390.42h-54.44c-6.91 0-12.5-5.6-12.5-12.5V182.15c0-6.91 5.6-12.5 12.5-12.5h54.44c6.91 0 12.5 5.6 12.5 12.5V377.92C500.02 384.83 494.43 390.42 487.52 390.42z"/></svg>
+      <label for="consoleV" class="right">  
+        <img id="browserIcon" src="images/consoleV.svg">
       </label>
     </div>
 
-    <div class="hiddenCheckbox" id="libs">
-      <img id="libraryIcon" src="images/library.svg">
-      <input id="showLibs" type="checkbox" v-model="showLibs">
-      <label class="highlight fade" for="showLibs">Show Libraries</label>
+    <!-- Show sidebar -->
+    <div id="ss" class="section">
+      <p class="label">Show sidebar</p>
+      <div id="ssOptions" class="hiddenRadio radioOptions">
+        <input type="radio" value="true" id="showSidebarOn" v-model="showSidebar">
+        <label class="radioSelection" for="showSidebarOn">On</label>
+        <input type="radio" value="false" id="showSidebarOff" v-model="showSidebar">
+        <label class="radioSelection" for="showSidebarOff">Off</label>
+      </div>
     </div>
 
-    <div>
-      <img id="textAdjust" src="images/textAdjust.svg">
-      <input id="textAdjustInput" class="highlight" type="text" v-model="fontSize" size=3>
-    </div>
 
-    <div id="indentation">
-      <label for="tabSize">Indentation Amout</label><input id="tabSize" class="highlight" type="text"  v-model="tabSize" size=3>
-    </div>
 
-    <div id="indentOptions" class="hiddenRadio">
-      <input type="radio" name="tabType" value="spaces" id="tabTypeS" v-model="tabType">
-      <label class="indentSelection" id="spaceBox" for="tabTypeS">
-        <span>
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="space" x="0" y="0" viewBox="111.98 169.64 394.28 116.59" enable-background="new 111.982048 169.6423035 394.276123 116.5872803" xml:space="preserve"><path d="M495.71 169.64h-50.1c-5.85 0-10.58 4.74-10.58 10.58v34.74H183.25v-34.74c0-5.84-4.74-10.58-10.58-10.58h-50.1c-5.84 0-10.58 4.74-10.58 10.58v45.32 50.1c0 5.84 4.74 10.58 10.58 10.58h50.1 272.95 36.41 13.69c5.85 0 10.58-4.74 10.58-10.58v-95.42C506.3 174.38 501.56 169.64 495.71 169.64z"/></svg>
-        </span>
-        spaces
-      </label>
-      <input type="radio" name="tabType" value="tabs" id="tabTypeT" v-model="tabType">
-      <label class="indentSelection" id="tabBox" for="tabTypeT">
-        <span>
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="tab" x="0" y="0" viewBox="111.98 169.64 394.28 196.29" enable-background="new 111.982048 169.6423035 394.276123 196.2901306" xml:space="preserve"><path d="M292.69 348.7v-47.75H123.92c-6.53 0-11.94-5.41-11.94-11.94v-47.75c0-6.53 5.41-11.94 11.94-11.94h168.77v-47.75c0-4.85 2.98-9.14 7.46-11 4.29-1.87 9.51-0.94 12.86 2.61l83.56 83.56c2.43 2.23 3.55 5.41 3.55 8.39 0 2.98-1.12 6.16-3.55 8.39l-83.56 83.56c-3.35 3.55-8.58 4.48-12.86 2.61C295.67 357.84 292.69 353.55 292.69 348.7z"/><path d="M435 355.35v-175.13c0-5.84 4.74-10.58 10.58-10.58h50.09c5.84 0 10.58 4.74 10.58 10.58v175.13c0 5.84-4.74 10.58-10.58 10.58h-50.09C439.74 365.93 435 361.19 435 355.35z"/></svg>
-        </span>
-        tabs
-      </label>
-
-    </div>
-
-    <div class="hiddenCheckbox" id="ww">
-      <img id="wordWrapIcon" src="images/wordWrap.svg">
-      <input id="wordWrap" type="checkbox" v-model="wordWrap">
-      <label class="highlight fade" for="wordWrap">Word Wrap</label>
-    </div>
-
-    <div class="hiddenCheckbox" id="runInBrowserContainer">
-      <img id="browserIcon" src="images/browser.svg">
-      <input type="checkbox" id="runInBrowser" v-model="runInBrowser">
-      <label class="highlight fade" for="runInBrowser">Run In Browser</label>
-    </div>
   </div>
 </div>

@@ -1,0 +1,75 @@
+<html>
+
+<script type="text/javascript">
+  
+var gui = require('nw.gui');
+var fs = require('fs');
+var Path = require('path');
+
+var winSettings = {
+  x: 50,
+  y: 50,
+  width: 1024,
+  height: 768,
+  toolbar: false,
+  focus: true,
+  show: false
+};
+
+localStorage.openWindows = 0;
+
+var windows = localStorage.windows ? JSON.parse(localStorage.windows) : [];
+localStorage.windows = JSON.stringify([]);
+
+var windowsToOpen = windows.filter(function(w){
+  return w.path && fs.existsSync(w.path);
+});
+
+windowsToOpen.forEach(function(w){
+  var win = gui.Window.open('index.html',{
+    x: w.x,
+    y: w.y,
+    width: w.width,
+    height: w.height-55,
+    toolbar: false,
+    focus: true,
+    show: false
+  });
+  win.on('document-start', function(){
+    win.window.PATH = w.path;
+    win.window.FILEPATH = w.filePath;
+    win.window.UNSAVED = w.temp;
+  });
+});
+
+function openProject(path) {
+  if (fs.lstatSync(path).isDirectory()) {
+    var sketchPath = Path.join(path, 'sketch.js');
+    if (fs.existsSync(sketchPath)) path = sketchPath;
+  }
+
+  var win = gui.Window.open('index.html', winSettings);
+  win.on('document-start', function(){
+    win.window.PATH = path; 
+  });
+}
+
+
+if (gui.App.argv.length > 0) {
+  openProject(gui.App.argv[0]);
+} 
+
+
+if (gui.App.argv.length === 0 && windowsToOpen.length === 0) {
+  var win = gui.Window.open('index.html', winSettings);
+}
+
+gui.App.on('open', function(cmdline) {
+  openProject(cmdline);
+});
+
+
+
+
+</script>
+</html>

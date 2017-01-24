@@ -1,0 +1,11 @@
+  <div id="tabs"> 
+    <ul id="tab-list"> 
+      <li v-repeat="tabs | orderBy 'name'" v-component="tab"></li>
+      <li id = "add">
+        <div>
+        <a href="#" v-on="click: $root.newFile()">+</a>
+      </div>
+        </li>  
+    </ul>
+
+  </div>

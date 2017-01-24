@@ -1,12 +1,16 @@
 #debug {
-  border-radius: 7px;
-  background-color: #F1F1F2;
+  background-color: #eeeeee;
   flex: 1;
   color: #333;
-  overflow-y: scroll;
+  overflow: auto;
 
-  pre {
+  div {
     margin: 5px;
+    white-space: pre;
+    a {
+      color: #fff;
+      background-color: #333;
+    }
   }
 }
 
@@ -15,9 +19,10 @@
 }
 
 #debug-container {
-  width: 300px;
+  width: 100px;
+  height: auto;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: flex-start;
   position: relative;
   min-width: 10px;
@@ -25,10 +30,22 @@
 }
 
 #debug-drag {
-  background-color: #C8Cw4C4;
-  width: 10px;
+  background-color: rgba(153, 153, 153, 0.5);
+  padding-top: 2px;
+  height: 18px !important;
   cursor: col-resize;
+  color: #b1b1b1;
+  font-size: 12px;
 }
+
+.prompt-label {
+  margin-left: 25px;
+}
+
+.console-label {
+  margin-left: 23px;
+}
+
 
 body.horizontal {
   #debug-container {

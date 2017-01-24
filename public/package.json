@@ -1,7 +1,7 @@
 {
   "name": "p5",
-  "version": "0.1.6",
-  "main": "index.html",
+  "version": "0.6.2",
+  "main": "boot.html",
   "window": {
     "title": "Untitled",
     "toolbar": false,
@@ -14,12 +14,17 @@
     "resizable": true
   },
   "dependencies": {
-    "wrench": "~1.5.8",
-    "trash": "~0.1.2",
-    "chokidar": "~0.8.2",
-    "node-static": "0.7.3",
+    "chokidar": "1.0.5",
+    "node-static": "0.7.6",
+    "p5.serialserver": "0.0.22",
     "portscanner": "1.0.0",
-    "socket.io": "1.0.6",
-    "semver": "~3.0.1"
+    "rimraf": "^2.3.4",
+    "semver": "~3.0.1",
+    "serialport": "git://github.com/julianduque/node-serialport.git#master",
+    "trash": "~0.1.2",
+    "wrench": "~1.5.8"
+  },
+  "devDependencies": {
+    "request": "^2.58.0"
   }
 }
