@@ -95,7 +95,7 @@ module.exports = {
     toggleFolder: function(folder, cb) {
       var self = this;
       folder.open = !folder.open;
-      if (folder.open) {
+      if (folder.open && folder.children.length === 0) {
         File.list(folder.path, function(files) {
           var childrenIds = _.map(folder.children, _.property('id'));
           var newFiles = _.filter(files, function(file) { return !_.contains(childrenIds, file.id); });
